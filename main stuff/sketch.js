@@ -13,11 +13,13 @@ let boxA;
 let comet;
 let ground;
 
+function preload() {
+  // preload images
+  helmetSprite = loadImage('sprites/helmet.png');
+}
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
-
-  //images
-  helmetSprite = loadImage('sprites/helmet.png');
 
   // create an engine
   engine = Engine.create();
@@ -26,7 +28,7 @@ function setup() {
   engine.world.gravity.y = 0.5;
 
   // create two boxes and a ground
-  helmet = Bodies.rectangle(200, 200, 80, 80);
+  helmet = Bodies.circle(200, 200, helmetSprite.height / 2, helmetSprite.width / 2);
   comet = Bodies.circle(800, 40, 20);
   ground = Bodies.rectangle(400, 800, 810, 10, {
     isStatic: true, angle: Math.PI * 0.06
