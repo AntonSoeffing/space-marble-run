@@ -10,12 +10,13 @@ const drawSprite = Helpers.drawSprite;
 let engine;
 
 let boxA;
-let comet;
+let meteorite;
 let ground;
 
 function preload() {
   // preload images
   helmetSprite = loadImage('sprites/helmet.png');
+  
 }
 
 function setup() {
@@ -29,13 +30,13 @@ function setup() {
 
   // create two boxes and a ground
   helmet = Bodies.circle(200, 200, helmetSprite.height / 2, helmetSprite.width / 2);
-  comet = Bodies.circle(800, 40, 20);
+  meteorite = Bodies.circle(800, 40, 20);
   ground = Bodies.rectangle(400, 800, 810, 10, {
     isStatic: true, angle: Math.PI * 0.06
   });
 
   // add all of the bodies to the world
-  World.add(engine.world, [helmet, comet, ground]);
+  World.add(engine.world, [helmet, meteorite, ground]);
 
   // run the engine
   Engine.run(engine);
@@ -47,7 +48,7 @@ function draw() {
   drawSprite(helmet, helmetSprite);
 
   fill(180);
-  drawBody(comet)
+  drawBody(meteorite)
 
   fill(128);
   drawBody(ground);
@@ -60,8 +61,8 @@ function keyPressed() {
       {x: helmet.position.x, y: helmet.position.y},
       {x: 0.015, y: -0.15}
     );
-    Body.applyForce(comet,
-      {x: comet.position.x, y: comet.position.y},
+    Body.applyForce(meteorite,
+      {x: meteorite.position.x, y: meteorite.position.y},
       {x: -0.1, y: 0.1}
     );
   }
