@@ -1,3 +1,5 @@
+Matter.use('matter-attractors');
+
 const Engine = Matter.Engine;
 const Render = Matter.Render;
 const World = Matter.World;
@@ -8,6 +10,7 @@ const drawBody = Helpers.drawBody;
 const drawSprite = Helpers.drawSprite;
 
 let engine;
+let attractor;
 
 let boxA;
 let meteorite;
@@ -16,7 +19,7 @@ let ground;
 function preload() {
   // preload images
   helmetSprite = loadImage('sprites/helmet.png');
-  
+  space = loadImage('sprites/hintergrund_transparenz.png');
 }
 
 function setup() {
@@ -26,10 +29,25 @@ function setup() {
   engine = Engine.create();
 
   // gravity
-  engine.world.gravity.y = 0.5;
+  engine.world.gravity.y = 0;
+
+  attractor = Bodies.circle(1600, 1000, 200, {
+    isStatic: true,
+    plugin: {
+      attractors: [
+        function(bodyA, bodyB) {
+          return {
+            x: (bodyA.position.x - bodyB.position.x) * 1e-7,
+            y: (bodyA.position.y - bodyB.position.y) * 1e-7,
+          };
+        }
+      ]
+    }
+  });
+  World.add(engine.world, attractor);
 
   // create two boxes and a ground
-  helmet = Bodies.circle(200, 200, helmetSprite.height / 2, helmetSprite.width / 2);
+  helmet = Bodies.circle(200, 600, helmetSprite.height / 2, {mass: 4});
   meteorite = Bodies.circle(800, 40, 20);
   ground = Bodies.rectangle(400, 800, 810, 10, {
     isStatic: true, angle: Math.PI * 0.06
@@ -43,7 +61,7 @@ function setup() {
 }
 
 function draw() {
-  background(0);
+  background(space);
 
   drawSprite(helmet, helmetSprite);
 
@@ -52,18 +70,23 @@ function draw() {
 
   fill(128);
   drawBody(ground);
+
+  fill(40);
+  drawBody(attractor)
 }
 
 function keyPressed() {
   // is SPACE pressed?
-  if (keyCode === 32) {
+  if (keyCode === 32 && helmet.position.x < 1000) {
     Body.applyForce(helmet,
       {x: helmet.position.x, y: helmet.position.y},
-      {x: 0.015, y: -0.15}
+      {x: 0.001, y: -0.015}
     );
-    Body.applyForce(meteorite,
-      {x: meteorite.position.x, y: meteorite.position.y},
-      {x: -0.1, y: 0.1}
+  } else {
+    Body.applyForce(helmet,
+      {x: helmet.position.x, y: helmet.position.y},
+      {x: 0.02, y: -0.010}
     );
   }
+
 }
