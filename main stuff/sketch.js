@@ -23,7 +23,7 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(5000, windowHeight);
 
   // create an engine
   engine = Engine.create();
@@ -65,6 +65,8 @@ function draw() {
 
   drawSprite(helmet, helmetSprite);
 
+  scrollFollow(helmet)
+
   fill(180);
   drawBody(meteorite)
 
@@ -80,7 +82,7 @@ function keyPressed() {
   if (keyCode === 32 && helmet.position.x < 1000) {
     Body.applyForce(helmet,
       {x: helmet.position.x, y: helmet.position.y},
-      {x: 0.001, y: -0.015}
+      {x: 0.001, y: 0.015}
     );
   } else {
     Body.applyForce(helmet,
@@ -88,5 +90,29 @@ function keyPressed() {
       {x: 0.02, y: -0.010}
     );
   }
+}
 
+function scrollFollow(matterObj) {
+  if (insideViewport(matterObj) == false) {
+    const $element = $('html, body');
+    if ($element.is(':animated') == false) {
+      $element.animate({
+        scrollLeft: helmet.position.x,
+        scrollTop: helmet.position.y
+      }, 1000);
+    }
+  }
+}
+
+function insideViewport(matterObj) {
+  const x = matterObj.position.x;
+  const y = matterObj.position.y;
+  const pageXOffset = window.pageXOffset || document.documentElement.scrollLeft;
+  const pageYOffset  = window.pageYOffset || document.documentElement.scrollTop;
+  if (x >= pageXOffset && x <= pageXOffset + windowWidth &&
+      y >= pageYOffset && y <= pageYOffset + windowHeight) {
+    return true;
+  } else {
+    return false;
+  }
 }
