@@ -29,3 +29,4 @@ class Sprite {
         image(this.animation[index], offsetX, offsetY);
         pop();
     }
+}
