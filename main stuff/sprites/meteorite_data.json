@@ -3,85 +3,85 @@
 		{
 			"filename": "meteorite_0.png",
 			"frame": {
-				"x": 0,
-				"y": 0,
-				"w": 32,
-				"h": 32
+				"x": 1,
+				"y": 1,
+				"w": 192,
+				"h": 192
 			},
 			"rotated": false,
 			"trimmed": false,
 			"spriteSourceSize": {
 				"x": 0,
 				"y": 0,
-				"w": 32,
-				"h": 32
+				"w": 192,
+				"h": 192
 			},
 			"sourceSize": {
-				"w": 32,
-				"h": 32
+				"w": 192,
+				"h": 192
 			}
 		},
 		{
 			"filename": "meteorite_1.png",
 			"frame": {
-				"x": 32,
-				"y": 0,
-				"w": 32,
-				"h": 32
+				"x": 195,
+				"y": 1,
+				"w": 192,
+				"h": 192
 			},
 			"rotated": false,
 			"trimmed": false,
 			"spriteSourceSize": {
 				"x": 0,
 				"y": 0,
-				"w": 32,
-				"h": 32
+				"w": 192,
+				"h": 192
 			},
 			"sourceSize": {
-				"w": 32,
-				"h": 32
+				"w": 192,
+				"h": 192
 			}
 		},
 		{
 			"filename": "meteorite_2.png",
 			"frame": {
-				"x": 0,
-				"y": 32,
-				"w": 32,
-				"h": 32
+				"x": 1,
+				"y": 195,
+				"w": 192,
+				"h": 192
 			},
 			"rotated": false,
 			"trimmed": false,
 			"spriteSourceSize": {
 				"x": 0,
 				"y": 0,
-				"w": 32,
-				"h": 32
+				"w": 192,
+				"h": 192
 			},
 			"sourceSize": {
-				"w": 32,
-				"h": 32
+				"w": 192,
+				"h": 192
 			}
 		},
 		{
 			"filename": "meteorite_3.png",
 			"frame": {
-				"x": 32,
-				"y": 32,
-				"w": 32,
-				"h": 32
+				"x": 195,
+				"y": 195,
+				"w": 192,
+				"h": 192
 			},
 			"rotated": false,
 			"trimmed": false,
 			"spriteSourceSize": {
 				"x": 0,
 				"y": 0,
-				"w": 32,
-				"h": 32
+				"w": 192,
+				"h": 192
 			},
 			"sourceSize": {
-				"w": 32,
-				"h": 32
+				"w": 192,
+				"h": 192
 			}
 		}
 	],
@@ -91,8 +91,8 @@
 		"image": "spritesheet.png",
 		"format": "RGBA8888",
 		"size": {
-			"w": 64,
-			"h": 64
+			"w": 388,
+			"h": 388
 		},
 		"scale": "1"
 	}
