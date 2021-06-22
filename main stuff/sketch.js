@@ -16,21 +16,21 @@ let attractor;
 let helmet;
 let helmetSprite;
 
-let meteorite;
-let meteoriteSprite;
+let comet;
+let cometSprite;
 
 let ground;
 
-let meteoriteSpriteData;
-let meteoriteSpriteSheet;
+let cometSpriteData;
+let cometSpriteSheet;
 
 function preload() {
   // preload images
   helmetSprite = loadImage('sprites/helmet.png');
   space = loadImage('sprites/hintergrund_transparenz.png');
   
-  meteoriteSpriteData = loadJSON('sprites/meteorite_data.json');
-  meteoriteSpriteSheet = loadImage('sprites/meteorite_sheet.png');
+  cometSpriteData = loadJSON('sprites/comet_data.json');
+  cometSpriteSheet = loadImage('sprites/comet_sheet.png');
 
 }
 
@@ -58,18 +58,18 @@ function setup() {
   World.add(engine.world, attractor);
 
   // create sprites
-  meteoriteSprite = new Sprite(meteoriteSpriteData, meteoriteSpriteSheet, 0.075);
+  cometSprite = new Sprite(cometSpriteData, cometSpriteSheet, 0.075);
   
 
   // create bodies
   helmet = Bodies.circle(200, 600, helmetSprite.height / 2, {mass: 4});
-  meteorite = Bodies.circle(600, 200, meteoriteSprite.animation[1].height / 4, {angle: 1.25 * Math.PI, mass: 0.25});
+  comet = Bodies.circle(600, 200, cometSprite.animation[1].height / 4, {angle: 1.25 * Math.PI, mass: 0.25});
   ground = Bodies.rectangle(400, 800, 810, 10, {
     isStatic: true, angle: Math.PI * 0.06
   });
 
   // add all of the bodies to the world
-  World.add(engine.world, [helmet, meteorite, ground]);
+  World.add(engine.world, [helmet, comet, ground]);
 
   // run the engine
   Engine.run(engine);
@@ -91,10 +91,10 @@ function draw() {
   drawBody(attractor);
 
   //fill(70);
-  //drawBody(meteorite);
+  //drawBody(comet);
 
-  Body.setAngle(meteorite, Vector.angle({x: 0, y: 0}, meteorite.velocity) + 1.25 * Math.PI)
-  meteoriteSprite.draw(meteorite, meteoriteSprite.animation[1].height / 7, -meteoriteSprite.animation[1].width / 7);
+  Body.setAngle(comet, Vector.angle({x: 0, y: 0}, comet.velocity) + 1.25 * Math.PI)
+  cometSprite.draw(comet, cometSprite.animation[1].height / 7, -cometSprite.animation[1].width / 7);
 }
 
 function keyPressed() {

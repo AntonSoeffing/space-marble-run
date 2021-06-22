@@ -1,7 +1,7 @@
 {
 	"frames": [
 		{
-			"filename": "meteorite_0.png",
+			"filename": "comet_0.png",
 			"frame": {
 				"x": 1,
 				"y": 1,
@@ -22,7 +22,7 @@
 			}
 		},
 		{
-			"filename": "meteorite_1.png",
+			"filename": "comet_1.png",
 			"frame": {
 				"x": 195,
 				"y": 1,
@@ -43,7 +43,7 @@
 			}
 		},
 		{
-			"filename": "meteorite_2.png",
+			"filename": "comet_2.png",
 			"frame": {
 				"x": 1,
 				"y": 195,
@@ -64,7 +64,7 @@
 			}
 		},
 		{
-			"filename": "meteorite_3.png",
+			"filename": "comet_3.png",
 			"frame": {
 				"x": 195,
 				"y": 195,
