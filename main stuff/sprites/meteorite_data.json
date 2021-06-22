@@ -1,0 +1,99 @@
+{
+	"frames": [
+		{
+			"filename": "meteorite_0.png",
+			"frame": {
+				"x": 0,
+				"y": 0,
+				"w": 32,
+				"h": 32
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 32,
+				"h": 32
+			},
+			"sourceSize": {
+				"w": 32,
+				"h": 32
+			}
+		},
+		{
+			"filename": "meteorite_1.png",
+			"frame": {
+				"x": 32,
+				"y": 0,
+				"w": 32,
+				"h": 32
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 32,
+				"h": 32
+			},
+			"sourceSize": {
+				"w": 32,
+				"h": 32
+			}
+		},
+		{
+			"filename": "meteorite_2.png",
+			"frame": {
+				"x": 0,
+				"y": 32,
+				"w": 32,
+				"h": 32
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 32,
+				"h": 32
+			},
+			"sourceSize": {
+				"w": 32,
+				"h": 32
+			}
+		},
+		{
+			"filename": "meteorite_3.png",
+			"frame": {
+				"x": 32,
+				"y": 32,
+				"w": 32,
+				"h": 32
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 32,
+				"h": 32
+			},
+			"sourceSize": {
+				"w": 32,
+				"h": 32
+			}
+		}
+	],
+	"meta": {
+		"app": "http://www.codeandweb.com/texturepacker",
+		"version": "1.0",
+		"image": "spritesheet.png",
+		"format": "RGBA8888",
+		"size": {
+			"w": 64,
+			"h": 64
+		},
+		"scale": "1"
+	}
+}

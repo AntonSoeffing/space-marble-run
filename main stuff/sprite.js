@@ -1,0 +1,41 @@
+class Sprite {
+    constructor(spriteData, spriteSheet, speed) {
+        this.spriteData = spriteData;
+        this.spriteSheet = spriteSheet;
+        this.animation = [];
+        this.speed = speed;
+        this.index = 0;
+        this.pos;
+        this.angle;
+
+        let frames = spriteData.frames;
+        for (let i = 0; i < frames.length; i++) {
+            let frame = frames[i].frame;
+            let img = spriteSheet.get(frame.x, frame.y, frame.w, frame.h);
+            this.animation.push(img);
+        }
+    }
+       
+    show(body) {    
+        this.pos = body.position;
+        this.angle = body.angle;
+        push();
+        this.index += this.speed;
+        let index = floor(this.index) % this.animation.length;
+        noSmooth();
+        scale(4);
+        translate(this.pos.x, this.pos.y);
+        rotate(this.angle);
+        imageMode(CENTER);
+        image(this.animation[index], 0, 0);
+        pop();
+    }
+    
+    showRandom() {
+        this.index += this.speed;
+        let index = floor(this.index) % this.animation.length;
+        noSmooth();
+        scale(4);
+        image(this.animation[index], this.x, this.y);
+    }
+}

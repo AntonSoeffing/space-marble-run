@@ -12,14 +12,25 @@ const drawSprite = Helpers.drawSprite;
 let engine;
 let attractor;
 
-let boxA;
+let helmet;
+let helmetSprite;
+
 let meteorite;
+let meteoriteSprite;
+
 let ground;
+
+let meteoriteSpriteData;
+let meteoriteSpriteSheet;
 
 function preload() {
   // preload images
   helmetSprite = loadImage('sprites/helmet.png');
   space = loadImage('sprites/hintergrund_transparenz.png');
+  
+  meteoriteSpriteData = loadJSON('sprites/meteorite_data.json');
+  meteoriteSpriteSheet = loadImage('sprites/meteorite_sheet.png');
+
 }
 
 function setup() {
@@ -29,7 +40,7 @@ function setup() {
   engine = Engine.create();
 
   // gravity
-  engine.world.gravity.y = 0;
+  engine.world.gravity.y = 1;
 
   attractor = Bodies.circle(1600, 1000, 200, {
     isStatic: true,
@@ -46,9 +57,13 @@ function setup() {
   });
   World.add(engine.world, attractor);
 
-  // create two boxes and a ground
+  // create sprites
+  meteoriteSprite = new Sprite(meteoriteSpriteData, meteoriteSpriteSheet, 0.1);
+  
+
+  // create bodies
   helmet = Bodies.circle(200, 600, helmetSprite.height / 2, {mass: 4});
-  meteorite = Bodies.circle(800, 40, 20);
+  meteorite = Bodies.circle(100, 100, 110);
   ground = Bodies.rectangle(400, 800, 810, 10, {
     isStatic: true, angle: Math.PI * 0.06
   });
@@ -67,14 +82,16 @@ function draw() {
 
   scrollFollow(helmet)
 
-  fill(180);
-  drawBody(meteorite)
-
   fill(128);
   drawBody(ground);
 
   fill(40);
-  drawBody(attractor)
+  drawBody(attractor);
+
+  fill(20);
+
+  meteoriteSprite.show(meteorite);
+  console.log(meteorite.position  )
 }
 
 function keyPressed() {
