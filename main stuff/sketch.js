@@ -5,6 +5,7 @@ const Render = Matter.Render;
 const World = Matter.World;
 const Body = Matter.Body;
 const Bodies = Matter.Bodies;
+const Vector = Matter.Vector;
 
 const drawBody = Helpers.drawBody;
 const drawSprite = Helpers.drawSprite;
@@ -38,8 +39,6 @@ function setup() {
   // create an engine
   engine = Engine.create();
 
-
-
   // gravity
   engine.world.gravity.y = 0;
 
@@ -64,7 +63,7 @@ function setup() {
 
   // create bodies
   helmet = Bodies.circle(200, 600, helmetSprite.height / 2, {mass: 4});
-  meteorite = Bodies.circle(600, 200, meteoriteSprite.animation[1].height / 4);
+  meteorite = Bodies.circle(600, 200, meteoriteSprite.animation[1].height / 4, {angle: 1.25 * Math.PI, mass: 0.25});
   ground = Bodies.rectangle(400, 800, 810, 10, {
     isStatic: true, angle: Math.PI * 0.06
   });
@@ -94,6 +93,7 @@ function draw() {
   //fill(70);
   //drawBody(meteorite);
 
+  Body.setAngle(meteorite, Vector.angle({x: 0, y: 0}, meteorite.velocity) + 1.25 * Math.PI)
   meteoriteSprite.draw(meteorite, meteoriteSprite.animation[1].height / 7, -meteoriteSprite.animation[1].width / 7);
 }
 
