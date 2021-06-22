@@ -35,12 +35,13 @@ function preload() {
 
 function setup() {
   createCanvas(5000, windowHeight);
-
   // create an engine
   engine = Engine.create();
 
+
+
   // gravity
-  engine.world.gravity.y = 1;
+  engine.world.gravity.y = 0;
 
   attractor = Bodies.circle(1600, 1000, 200, {
     isStatic: true,
@@ -58,12 +59,12 @@ function setup() {
   World.add(engine.world, attractor);
 
   // create sprites
-  meteoriteSprite = new Sprite(meteoriteSpriteData, meteoriteSpriteSheet, 0.1);
+  meteoriteSprite = new Sprite(meteoriteSpriteData, meteoriteSpriteSheet, 0.075);
   
 
   // create bodies
   helmet = Bodies.circle(200, 600, helmetSprite.height / 2, {mass: 4});
-  meteorite = Bodies.circle(100, 100, 110);
+  meteorite = Bodies.circle(600, 200, meteoriteSprite.animation[1].height / 4);
   ground = Bodies.rectangle(400, 800, 810, 10, {
     isStatic: true, angle: Math.PI * 0.06
   });
@@ -78,6 +79,8 @@ function setup() {
 function draw() {
   background(space);
 
+  frameRate(60);
+
   drawSprite(helmet, helmetSprite);
 
   scrollFollow(helmet)
@@ -88,10 +91,10 @@ function draw() {
   fill(40);
   drawBody(attractor);
 
-  fill(20);
+  //fill(70);
+  //drawBody(meteorite);
 
-  meteoriteSprite.show(meteorite);
-  console.log(meteorite.position  )
+  meteoriteSprite.draw(meteorite, meteoriteSprite.animation[1].height / 7, -meteoriteSprite.animation[1].width / 7);
 }
 
 function keyPressed() {
