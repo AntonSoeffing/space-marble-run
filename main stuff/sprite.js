@@ -16,18 +16,18 @@ class Sprite {
         }
     }
        
-    show(body) {    
-        this.pos = body.position;
-        this.angle = body.angle;
+    draw(body) {    
+        const pos = body.position;
+        const angle = body.angle;
         push();
         this.index += this.speed;
         let index = floor(this.index) % this.animation.length;
-        noSmooth();
-        scale(4);
-        translate(this.pos.x, this.pos.y);
-        rotate(this.angle);
+        translate(pos.x, pos.y);
+        rotate(angle);
+
         imageMode(CENTER);
         image(this.animation[index], 0, 0);
+        this.animation[index].resize(120, 0);
         pop();
     }
     
