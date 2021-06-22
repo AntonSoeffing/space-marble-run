@@ -16,7 +16,8 @@ let attractor;
 let helmet;
 let helmetSprite;
 
-let comet;
+let cometSprites = [];
+let comets = [];
 let cometSprite;
 
 let ground;
@@ -58,18 +59,25 @@ function setup() {
   World.add(engine.world, attractor);
 
   // create sprites
-  cometSprite = new Sprite(cometSpriteData, cometSpriteSheet, 0.075);
+  //cometSprite = new Sprite(cometSpriteData, cometSpriteSheet, 0.075);
   
+  for (let i = 0; i < 5; i++) {
+    cometSprites[i] = new Sprite(cometSpriteData, cometSpriteSheet, 0.075);;
+  }
 
   // create bodies
   helmet = Bodies.circle(200, 600, helmetSprite.height / 2, {mass: 4});
-  comet = Bodies.circle(600, 200, cometSprite.animation[1].height / 4, {angle: 1.25 * Math.PI, mass: 0.25});
+  
+  for (let i = 0; i < 5; i++) {
+  comets[i] = Bodies.circle(random(100, windowWidth), random(0, 800), cometSprites[1].animation[1].height / 4, {angle: 1.25 * Math.PI, mass: 0.25});
+  }
+
   ground = Bodies.rectangle(400, 800, 810, 10, {
     isStatic: true, angle: Math.PI * 0.06
   });
 
   // add all of the bodies to the world
-  World.add(engine.world, [helmet, comet, ground]);
+  World.add(engine.world, comets, [helmet, ground]);
 
   // run the engine
   Engine.run(engine);
@@ -93,8 +101,12 @@ function draw() {
   //fill(70);
   //drawBody(comet);
 
-  Body.setAngle(comet, Vector.angle({x: 0, y: 0}, comet.velocity) + 1.25 * Math.PI)
-  cometSprite.draw(comet, cometSprite.animation[1].height / 7, -cometSprite.animation[1].width / 7);
+  for (let i = 0; i < 5; i++) {
+    Body.setAngle(comets[i], Vector.angle({x: 0, y: 0}, comets[i].velocity) + 1.25 * Math.PI)
+    cometSprites[i].draw(comets[i], cometSprites[i].animation[1].height / 7, -cometSprites[i].animation[1].width / 7);
+  }
+
+
 }
 
 function keyPressed() {
