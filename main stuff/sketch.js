@@ -42,6 +42,8 @@ function preload() {
 function setup() {
   createCanvas(5000, windowHeight);
 
+  engine.gravity.y = 0;
+
   // Start runner
   Runner.run(runner, engine);
 
