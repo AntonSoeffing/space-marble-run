@@ -1,8 +1,9 @@
 Matter.use('matter-attractors');
 
 const Engine = Matter.Engine;
-const Render = Matter.Render;
+const Runner = Matter.Runner;
 const Composite = Matter.Composite;
+const Composites = Matter.Composites;
 const Body = Matter.Body;
 const Bodies = Matter.Bodies;
 const Vector = Matter.Vector;
@@ -10,8 +11,11 @@ const Vector = Matter.Vector;
 const drawBody = Helpers.drawBody;
 const drawSprite = Helpers.drawSprite;
 
-let engine;
-let attractor;
+let engine = Engine.create();
+let world = engine.world;
+let runner = Runner.create();
+
+let blackHole;
 
 let helmet;
 let helmetSprite;
@@ -37,13 +41,12 @@ function preload() {
 
 function setup() {
   createCanvas(5000, windowHeight);
-  // create an engine
-  engine = Engine.create();
 
-  // Gravity
-  engine.world.gravity.y = 0;
+  // Start runner
+  Runner.run(runner, engine);
 
-  attractor = Bodies.circle(1600, 1000, 200, {
+  // Black Hole
+  blackHole = Bodies.circle(1600, 1000, 200, {
     isStatic: true,
     plugin: {
       attractors: [
@@ -56,33 +59,27 @@ function setup() {
       ]
     }
   });
-  Composite.add(engine.world, attractor);
-
-  // create sprites
-  //cometSprite = new Sprite(cometSpriteData, cometSpriteSheet, 0.075);
-  
-  for (let i = 0; i < 5; i++) {
-    cometSprites[i] = new Sprite(cometSpriteData, cometSpriteSheet, 0.075);;
-  }
+  Composite.add(world, blackHole);
 
   // Helmet
   helmet = Bodies.circle(200, 600, helmetSprite.height / 2, {mass: 4});
-  Composite.add(engine.world, helmet);
+  Composite.add(world, helmet);
   
   // Ground
   ground = Bodies.rectangle(400, 800, 810, 10, {
     isStatic: true, angle: Math.PI * 0.06
   });
-  Composite.add(engine.world, ground);
+  Composite.add(world, ground);
 
   // Comets
   for (let i = 0; i < 5; i++) {
+    cometSprites[i] = new Sprite(cometSpriteData, cometSpriteSheet, 0.075);
+  }
+
+  for (let i = 0; i < 5; i++) {
   comets[i] = Bodies.circle(random(100, windowWidth), random(0, 800), cometSprites[1].animation[1].height / 4, {angle: 1.25 * Math.PI, mass: 0.25});
   }
-  Composite.add(engine.world, comets);
-
-  // run the engine
-  Engine.run(engine);
+  Composite.add(world, comets);
 }
 
 function draw() {
@@ -98,17 +95,12 @@ function draw() {
   drawBody(ground);
 
   fill(40);
-  drawBody(attractor);
-
-  //fill(70);
-  //drawBody(comet);
+  drawBody(blackHole);
 
   for (let i = 0; i < 5; i++) {
     Body.setAngle(comets[i], Vector.angle({x: 0, y: 0}, comets[i].velocity) + 1.25 * Math.PI)
     cometSprites[i].draw(comets[i], cometSprites[i].animation[1].height / 7, -cometSprites[i].animation[1].width / 7);
   }
-
-
 }
 
 function keyPressed() {
