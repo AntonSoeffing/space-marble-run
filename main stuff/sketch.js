@@ -7,6 +7,7 @@ const Composites = Matter.Composites;
 const Body = Matter.Body;
 const Bodies = Matter.Bodies;
 const Vector = Matter.Vector;
+const Events = Matter.Events;
 
 const drawBody = Helpers.drawBody;
 const drawSprite = Helpers.drawSprite;
@@ -49,6 +50,7 @@ function setup() {
 
   // Black Hole
   blackHole = Bodies.circle(1600, 1000, 200, {
+    label: 'blackHole',
     isStatic: true,
     plugin: {
       attractors: [
@@ -74,14 +76,33 @@ function setup() {
   Composite.add(world, ground);
 
   // Comets
-  for (let i = 0; i < 5; i++) {
+  let cometsCount = 5;
+
+  for (let i = 0; i < cometsCount; i++) {
     cometSprites[i] = new Sprite(cometSpriteData, cometSpriteSheet, 0.075);
   }
 
-  for (let i = 0; i < 5; i++) {
-  comets[i] = Bodies.circle(random(100, windowWidth), random(0, 800), cometSprites[1].animation[1].height / 4, {angle: 1.25 * Math.PI, mass: 0.25});
+  for (let i = 0; i < cometsCount; i++) {
+    comets[i] = Bodies.circle(random(100, windowWidth), random(0, 800), cometSprites[0].animation[0].height / 4, {angle: 1.25 * Math.PI, mass: 0.25});
   }
   Composite.add(world, comets);
+
+  Events.on(engine, 'collisionStart', function(event) {
+    event.pairs.forEach(({ bodyA, bodyB }) => {
+      let objectToRemove;
+      if (bodyB == blackHole && bodyA !== blackHole) {
+        objectToRemove = bodyA;
+      } else if (bodyA == blackHole && bodyB !== blackHole) {
+        objectToRemove = bodyB;
+      }
+      if (objectToRemove) {
+        Matter.World.remove(world, objectToRemove);
+        let index = comets.indexOf(objectToRemove);
+        comets.splice(index, 1);
+        cometSprites.splice(index, 1);
+      }
+    });
+  });
 }
 
 function draw() {
@@ -99,9 +120,9 @@ function draw() {
   fill(40);
   drawBody(blackHole);
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < comets.length; i++) {
     Body.setAngle(comets[i], Vector.angle({x: 0, y: 0}, comets[i].velocity) + 1.25 * Math.PI)
-    cometSprites[i].draw(comets[i], cometSprites[i].animation[1].height / 7, -cometSprites[i].animation[1].width / 7);
+    cometSprites[i].draw(comets[i], cometSprites[i].animation[0].height / 7, -cometSprites[i].animation[0].width / 7);
   }
 }
 
