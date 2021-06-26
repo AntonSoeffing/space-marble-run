@@ -98,9 +98,9 @@ function setup() {
 }
 
 function draw() {
-  background(space);
-
   frameRate(60);
+
+  drawSpaceBackground();
 
   drawSprite(helmet, helmetSprite);
 
@@ -115,17 +115,16 @@ function draw() {
   }
 }
 
+function drawSpaceBackground() {
+  background(10);
+  
+}
+
 function keyPressed() {
   // is SPACE pressed?
-  if (keyCode === 32 && helmet.position.x < 1000) {
-    Body.applyForce(helmet,
-      {x: helmet.position.x, y: helmet.position.y},
-      {x: 0.001, y: 0.015}
-    );
-  } else {
-    Body.applyForce(helmet,
-      {x: helmet.position.x, y: helmet.position.y},
-      {x: 0.02, y: -0.010}
+  if (keyCode === 32) {
+    Body.setVelocity(helmet,
+      {x: 1.25, y: -0.5}
     );
   }
 }
