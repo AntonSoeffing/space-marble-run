@@ -25,8 +25,6 @@ let cometSprites = [];
 let comets = [];
 let cometSprite;
 
-let ground;
-
 let cometSpriteData;
 let cometSpriteSheet;
 
@@ -68,12 +66,6 @@ function setup() {
   // Helmet
   helmet = Bodies.circle(200, 600, helmetSprite.height / 2, {mass: 4});
   Composite.add(world, helmet);
-  
-  // Ground
-  ground = Bodies.rectangle(400, 800, 810, 10, {
-    isStatic: true, angle: Math.PI * 0.06
-  });
-  Composite.add(world, ground);
 
   // Comets
   let cometsCount = 5;
@@ -113,9 +105,6 @@ function draw() {
   drawSprite(helmet, helmetSprite);
 
   scrollFollow(helmet)
-
-  fill(128);
-  drawBody(ground);
 
   fill(40);
   drawBody(blackHole);
