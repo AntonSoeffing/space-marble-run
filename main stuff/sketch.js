@@ -4,13 +4,16 @@ const Engine = Matter.Engine;
 const Runner = Matter.Runner;
 const Composite = Matter.Composite;
 const Composites = Matter.Composites;
+const Constraint = Matter.Constraint;
 const Body = Matter.Body;
 const Bodies = Matter.Bodies;
 const Vector = Matter.Vector;
 const Events = Matter.Events;
 
 const drawBody = Helpers.drawBody;
+const drawBodies = Helpers.drawBodies;
 const drawSprite = Helpers.drawSprite;
+const drawConstraints = Helpers.drawConstraints;
 
 let engine = Engine.create();
 let world = engine.world;
@@ -88,6 +91,28 @@ function setup() {
   }
   Composite.add(world, comets);
 
+  // Bridge
+  const group = Body.nextGroup(true);
+  const rects = Composites.stack(2000, 950, 10, 1, 10, 10, function(x, y) {
+      return Bodies.rectangle(x, y, 50, 20, { collisionFilter: { group: group } });
+  });
+  bridge = Composites.chain(rects, 0.5, 0, -0.5, 0, {stiffness: 0.8, length: 2, render: {type: 'line'}});
+  Composite.add(world, [bridge]);
+
+  // left and right fix point of bridge
+  Composite.add(rects, Constraint.create({
+    pointA: {x: 2000, y: 950},
+    bodyB: rects.bodies[0],
+    pointB: {x: -25, y: 0},
+    stiffness: 0.1
+  }));
+  Composite.add(rects, Constraint.create({
+    pointA: {x: 2600, y: 950},
+    bodyB: rects.bodies[rects.bodies.length-1],
+    pointB: {x: +25, y: 0},
+    stiffness: 0.02
+  }));
+
   Events.on(engine, 'collisionStart', function(event) {
     event.pairs.forEach(({ bodyA, bodyB }) => {
       let objectToRemove;
@@ -122,6 +147,9 @@ function draw() {
   fill(40);
   drawBody(blackHole);
 
+  drawBodies(bridge.bodies);
+  drawConstraints(bridge.constraints);
+
   for (let i = 0; i < comets.length; i++) {
     Body.setAngle(comets[i], Vector.angle({x: 0, y: 0}, comets[i].velocity) + 1.25 * Math.PI)
     cometSprites[i].draw(comets[i], cometSprites[i].animation[0].height / 7, -cometSprites[i].animation[0].width / 7);
@@ -130,12 +158,17 @@ function draw() {
 
 function keyPressed() {
   // is SPACE pressed?
-  if (keyCode === 32) {
+  if (keyCode === 32 && engine.gravity.y == 0) {
     Body.setVelocity(helmet,
       {x: 5.25, y: -0.5}
     );
     // Tell p5.js to prevent default behavior on Spacebar press (scrolling)
     return(false);
+  } else {
+    Body.applyForce(helmet,
+      {x: helmet.position.x, y: helmet.position.y},
+      {x: 0.03, y: -0.1}
+    );
   }
 }
 
