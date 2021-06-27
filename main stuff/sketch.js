@@ -127,6 +127,8 @@ function keyPressed() {
     Body.setVelocity(helmet,
       {x: 1.25, y: -0.5}
     );
+    // Tell p5.js to prevent default behavior on Spacebar press (scrolling)
+    return(false);
   }
 }
 
