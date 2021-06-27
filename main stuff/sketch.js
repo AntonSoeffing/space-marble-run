@@ -21,21 +21,24 @@ let blackHole;
 let helmet;
 let helmetSprite;
 
-let cometSprites = [];
 let comets = [];
+let cometSprites = [];
 let cometSprite;
-
 let cometSpriteData;
 let cometSpriteSheet;
 
 function preload() {
-  // preload images
+  // Preload images
+  // Background Elements
+  planetSprite = loadImage('sprites/backgrounds/space/planet.png');
+  starSprite = loadImage('sprites/backgrounds/space/star_3.png');
+
+  // Helmet
   helmetSprite = loadImage('sprites/helmet.png');
-  space = loadImage('sprites/hintergrund_transparenz.png');
   
+  // Comets
   cometSpriteData = loadJSON('sprites/comet_data.json');
   cometSpriteSheet = loadImage('sprites/comet_sheet.png');
-
 }
 
 function setup() {
@@ -43,8 +46,11 @@ function setup() {
 
   engine.gravity.y = 0;
 
-  // Start runner
+  // Start Runner
   Runner.run(runner, engine);
+
+  // Background
+  spaceBackground = new Background('space', 50, 200);
 
   // Black Hole
   blackHole = Bodies.circle(1600, 1000, 200, {
@@ -100,7 +106,7 @@ function setup() {
 function draw() {
   frameRate(60);
 
-  drawSpaceBackground();
+  spaceBackground.draw();
 
   drawSprite(helmet, helmetSprite);
 
@@ -113,11 +119,6 @@ function draw() {
     Body.setAngle(comets[i], Vector.angle({x: 0, y: 0}, comets[i].velocity) + 1.25 * Math.PI)
     cometSprites[i].draw(comets[i], cometSprites[i].animation[0].height / 7, -cometSprites[i].animation[0].width / 7);
   }
-}
-
-function drawSpaceBackground() {
-  background(10);
-  
 }
 
 function keyPressed() {
