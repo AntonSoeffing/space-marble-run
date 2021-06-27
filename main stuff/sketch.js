@@ -29,13 +29,16 @@ let cometSpriteSheet;
 
 function preload() {
   // Preload images
+  // Background
+  mars = loadImage('sprites/backgrounds/mars/mars.png');
+
   // Background Elements
   planetSprite = loadImage('sprites/backgrounds/space/planet.png');
   starSprite = loadImage('sprites/backgrounds/space/star_3.png');
 
   // Helmet
   helmetSprite = loadImage('sprites/helmet.png');
-  
+
   // Comets
   cometSpriteData = loadJSON('sprites/comet_data.json');
   cometSpriteSheet = loadImage('sprites/comet_sheet.png');
@@ -106,7 +109,11 @@ function setup() {
 function draw() {
   frameRate(60);
 
-  spaceBackground.draw();
+  if (engine.gravity.y == 1) {
+    background(mars)
+  } else {
+    spaceBackground.draw();
+  }
 
   drawSprite(helmet, helmetSprite);
 
@@ -125,11 +132,16 @@ function keyPressed() {
   // is SPACE pressed?
   if (keyCode === 32) {
     Body.setVelocity(helmet,
-      {x: 1.25, y: -0.5}
+      {x: 5.25, y: -0.5}
     );
     // Tell p5.js to prevent default behavior on Spacebar press (scrolling)
     return(false);
   }
+}
+
+function marsLanding() {
+  engine.gravity.y = 1;
+  Composite.remove(world, blackHole)
 }
 
 function scrollFollow(matterObj) {
@@ -140,6 +152,7 @@ function scrollFollow(matterObj) {
         scrollLeft: helmet.position.x,
         scrollTop: helmet.position.y
       }, 1000);
+      marsLanding()
     }
   }
 }
