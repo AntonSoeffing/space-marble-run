@@ -32,10 +32,10 @@ let cometSpriteSheet;
 
 function preload() {
   // Preload images
-  // Background
-  mars = loadImage('sprites/backgrounds/mars/mars.png');
+  // Mars Background
+  marsSprite = loadImage('sprites/backgrounds/mars/mars.png');
 
-  // Background Elements
+  // Space Background Elements
   planetSprite = loadImage('sprites/backgrounds/space/planet.png');
   starSprite = loadImage('sprites/backgrounds/space/star_3.png');
 
@@ -55,8 +55,9 @@ function setup() {
   // Start Runner
   Runner.run(runner, engine);
 
-  // Background
+  // Backgrounds
   spaceBackground = new Background('space', 50, 200);
+  marsBackground = new Background('mars');
 
   // Black Hole
   blackHole = Bodies.circle(1600, 1000, 200, {
@@ -135,7 +136,7 @@ function draw() {
   frameRate(60);
 
   if (engine.gravity.y == 1) {
-    background(mars)
+    marsBackground.draw();
   } else {
     spaceBackground.draw();
   }

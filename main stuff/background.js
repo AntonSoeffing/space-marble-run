@@ -6,11 +6,12 @@ class Star {
 }
 
 class Background {
-    constructor(variant = 'space' || 'mars', starsCount = 20, spread = 250) {
+    constructor(variant = 'space', starsCount = 20, spread = 250) {
         this.variant = variant;
         this.stars = [];
         
-        if (this.variant = 'space') {
+        //console.log(this.variant);
+        if (this.variant == 'space') {
             // Generate stars with random position
             while (this.stars.length < starsCount) {
                 let x = random(0, width);
@@ -36,20 +37,30 @@ class Background {
     }
 
     draw() {
-        if (this.variant = 'space') {
-            background(10);
-            
-            // Draw Stars
-            push();
-            for (let i = 0; i < this.stars.length; i++) {
-                drawingContext.globalAlpha = 0.8;
-                image(starSprite, this.stars[i].x, this.stars[i].y);
-                drawingContext.globalAlpha = 1;
-              }
-            pop();
+        console.log(marsBackground);
+        //console.log(this.variant);
+        switch (this.variant) {
+            case 'space':
+                background(10);
+                
+                // Draw Stars
+                push();
+                for (let i = 0; i < this.stars.length; i++) {
+                    drawingContext.globalAlpha = 0.8;
+                    image(starSprite, this.stars[i].x, this.stars[i].y);
+                    drawingContext.globalAlpha = 1;
+                }
+                pop();
 
-            // Draw Planet
-            image(planetSprite, windowWidth * 0.8, windowHeight * 0.2);
+                // Draw Planet
+                image(planetSprite, windowWidth * 0.8, windowHeight * 0.2);
+                break;
+            case 'mars':
+                background(marsSprite);
+                break;
+            default:
+                background('red');
+                break;
         }
     }
 }
