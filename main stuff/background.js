@@ -10,7 +10,6 @@ class Background {
         this.variant = variant;
         this.stars = [];
         
-        //console.log(this.variant);
         if (this.variant == 'space') {
             // Generate stars with random position
             while (this.stars.length < starsCount) {
@@ -37,8 +36,6 @@ class Background {
     }
 
     draw() {
-        console.log(marsBackground);
-        //console.log(this.variant);
         switch (this.variant) {
             case 'space':
                 background(10);
