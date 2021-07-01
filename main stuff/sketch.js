@@ -30,6 +30,8 @@ let cometSprite;
 let cometSpriteData;
 let cometSpriteSheet;
 
+let reverse = false;
+
 function preload() {
   // Preload images
   // Mars Background
@@ -98,7 +100,7 @@ function setup() {
 
   // Bridge
   const group = Body.nextGroup(true);
-  const rects = Composites.stack(2000, 950, 10, 1, 10, 10, function(x, y) {
+  const rects = Composites.stack(3200, 750, 10, 1, 10, 10, function(x, y) {
       return Bodies.rectangle(x, y, 50, 20, { collisionFilter: { group: group } });
   });
   bridge = Composites.chain(rects, 0.5, 0, -0.5, 0, {stiffness: 0.8, length: 2, render: {type: 'line'}});
@@ -106,17 +108,26 @@ function setup() {
 
   // left and right fix point of bridge
   Composite.add(rects, Constraint.create({
-    pointA: {x: 2000, y: 950},
+    pointA: {x: 3200, y: 750},
     bodyB: rects.bodies[0],
     pointB: {x: -25, y: 0},
     stiffness: 0.1
   }));
   Composite.add(rects, Constraint.create({
-    pointA: {x: 2600, y: 950},
+    pointA: {x: 3800, y: 750},
     bodyB: rects.bodies[rects.bodies.length-1],
     pointB: {x: +25, y: 0},
     stiffness: 0.02
   }));
+
+  // Stack of blocks
+  blockStack = Composites.stack(2800, 570, 3, 20, 3, 3, function(x, y) {
+    return Bodies.rectangle(x, y, 20, 20);
+  });
+
+  // Platform
+  platform = Bodies.rectangle(3300, 550, 200, 30, {isStatic: true});
+  Composite.add(world, platform);
 
   Events.on(engine, 'collisionStart', function(event) {
     event.pairs.forEach(({ bodyA, bodyB }) => {
@@ -149,11 +160,34 @@ function draw() {
 
   scrollFollow(helmet)
 
+  fill(250);
+
+  //Platform logic
+  if(reverse == false && platform.position.x < 4000) {
+    Body.translate(platform, {x: +2, y: 0})
+  } else if (platform.position.x == 4000 && reverse == false) {
+    reverse = true;
+  } else if (reverse == true && platform.position.x > 3300) {
+    Body.translate(platform, {x: -2, y: 0})
+  } else if (platform.position.x == 3300 && reverse == true) {
+    reverse = false;
+  }
+  drawBody(platform);
+
+  let onPlatform = Matter.SAT.collides(helmet, platform);
+
+  if(onPlatform.collided && reverse == false) {
+    Body.translate(helmet,{x: 2, y: 0});
+  } else if (onPlatform.collided && reverse == true) {
+    Body.translate(helmet,{x: -2, y: 0});
+  }
+
   fill(40);
   drawBody(blackHole);
 
   drawBodies(bridge.bodies);
   drawConstraints(bridge.constraints);
+  drawBodies(blockStack.bodies);
 
   for (let i = 0; i < comets.length; i++) {
     Body.setAngle(comets[i], Vector.angle({x: 0, y: 0}, comets[i].velocity) + 1.25 * Math.PI)
@@ -180,6 +214,7 @@ function keyPressed() {
 function marsLanding() {
   engine.gravity.y = 1;
   Composite.remove(world, blackHole)
+  Composite.add(world, blockStack);
 }
 
 function scrollFollow(matterObj) {
