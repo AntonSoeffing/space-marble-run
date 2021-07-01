@@ -48,7 +48,7 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(5000, windowHeight);
+  createCanvas(windowWidth * 2, windowHeight);
 
   engine.gravity.y = 0;
 
@@ -91,6 +91,10 @@ function setup() {
     comets[i] = Bodies.circle(random(100, windowWidth), random(0, 800), cometSprites[0].animation[0].height / 4, {angle: 1.25 * Math.PI, mass: 0.25});
   }
   Composite.add(world, comets);
+
+  //marsGround
+  marsGround = Bodies.rectangle(windowWidth * 1.5, 870, windowWidth, 20, {isStatic: true})
+  Composite.add(world, marsGround);
 
   // Bridge
   const group = Body.nextGroup(true);
