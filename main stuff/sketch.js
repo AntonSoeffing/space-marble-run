@@ -60,12 +60,6 @@ function setup() {
   spaceBackground = new Background('space', 50, 200);
   marsBackground = new Background('mars');
 
-  // Helmet
-  helmetBody = Bodies.circle(200, 600, helmetSprite.height / 2, {mass: 4});
-  Composite.add(world, helmetBody);
-  helmet = new Helmet(helmetBody, helmetSprite);
-  spaceObjects.push(helmet);
-
   // ----- SPACE -----
   // Black Hole
   blackHole = Bodies.circle(1600, 1000, 200, {
@@ -84,6 +78,12 @@ function setup() {
   });
   Composite.add(world, blackHole);
 
+  // Helmet
+  helmetBody = Bodies.circle(200, 600, helmetSprite.height / 2, {mass: 4});
+  Composite.add(world, helmetBody);
+  helmet = new Helmet(helmetBody, helmetSprite);
+  spaceObjects.push(helmet);
+  
   // Comets
   let spaceObjectsCount = 5;
 
