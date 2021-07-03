@@ -1,0 +1,2 @@
+class Comet extends SpaceObject {
+}

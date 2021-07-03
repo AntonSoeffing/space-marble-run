@@ -21,12 +21,11 @@ let runner = Runner.create();
 
 let blackHole;
 
+let spaceObjects = [];
+
 let helmet;
 let helmetSprite;
 
-let comets = [];
-let cometSprites = [];
-let cometSprite;
 let cometSpriteData;
 let cometSpriteSheet;
 
@@ -62,8 +61,10 @@ function setup() {
   marsBackground = new Background('mars');
 
   // Helmet
-  helmet = Bodies.circle(200, 600, helmetSprite.height / 2, {mass: 4});
-  Composite.add(world, helmet);
+  helmetBody = Bodies.circle(200, 600, helmetSprite.height / 2, {mass: 4});
+  Composite.add(world, helmetBody);
+  helmet = new Helmet(helmetBody, helmetSprite);
+  spaceObjects.push(helmet);
 
   // ----- SPACE -----
   // Black Hole
@@ -84,16 +85,15 @@ function setup() {
   Composite.add(world, blackHole);
 
   // Comets
-  let cometsCount = 5;
+  let spaceObjectsCount = 5;
 
-  for (let i = 0; i < cometsCount; i++) {
-    cometSprites[i] = new Sprite(cometSpriteData, cometSpriteSheet, 0.075);
-  }
+  for (let i = 0; i < spaceObjectsCount; i++) {
+    let sprite = new Sprite(cometSpriteData, cometSpriteSheet, 0.075);
+    let body = Bodies.circle(random(100, windowWidth), random(0, 800), sprite.animation[0].height / 4, {angle: 1.25 * Math.PI, mass: 0.25});
+    spaceObjects.push(new Comet(body, sprite));
 
-  for (let i = 0; i < cometsCount; i++) {
-    comets[i] = Bodies.circle(random(100, windowWidth), random(0, 800), cometSprites[0].animation[0].height / 4, {angle: 1.25 * Math.PI, mass: 0.25});
+    Composite.add(world, body);
   }
-  Composite.add(world, comets);
 
   Events.on(engine, 'collisionStart', function(event) {
     event.pairs.forEach(({ bodyA, bodyB }) => {
@@ -105,9 +105,13 @@ function setup() {
       }
       if (objectToRemove) {
         Matter.World.remove(world, objectToRemove);
-        let index = comets.indexOf(objectToRemove);
-        comets.splice(index, 1);
-        cometSprites.splice(index, 1);
+
+        for (let i = 0; i < spaceObjects.length; i++) {
+          if (spaceObjects[i].body == objectToRemove) {
+            spaceObjects.splice(i, 1);
+            break;
+          }          
+        }
       }
     });
   });
@@ -158,15 +162,20 @@ function draw() {
     spaceBackground.draw();
   }
 
-  drawSprite(helmet, helmetSprite);
-
-  scrollFollow(helmet)
+  scrollFollow(helmet.body);
 
   // ----- SPACE -----
   drawBody(blackHole);
-  for (let i = 0; i < comets.length; i++) {
-    Body.setAngle(comets[i], Vector.angle({x: 0, y: 0}, comets[i].velocity) + 1.25 * Math.PI)
-    cometSprites[i].draw(comets[i], cometSprites[i].animation[0].height / 7, -cometSprites[i].animation[0].width / 7);
+
+  for (let i = 0; i < spaceObjects.length; i++) {
+    if (spaceObjects[i] instanceof Comet) {
+      // Comet
+      Body.setAngle(spaceObjects[i].body, Vector.angle({x: 0, y: 0}, spaceObjects[i].body.velocity) + 1.25 * Math.PI)
+      spaceObjects[i].sprite.draw(spaceObjects[i].body, spaceObjects[i].sprite.animation[0].height / 7, -spaceObjects[i].sprite.animation[0].width / 7);
+    } else if (spaceObjects[i] instanceof Helmet) {
+      // Helmet
+      drawSprite(spaceObjects[i].body, spaceObjects[i].sprite)
+    }
   }
 
   // ----- MARS -----
@@ -184,12 +193,12 @@ function draw() {
   }
   drawBody(platform);
 
-  let onPlatform = Matter.SAT.collides(helmet, platform);
+  let onPlatform = Matter.SAT.collides(helmet.body, platform);
 
   if(onPlatform.collided && reverse == false) {
-    Body.translate(helmet,{x: 2, y: 0});
+    Body.translate(helmet.body,{x: 2, y: 0});
   } else if (onPlatform.collided && reverse == true) {
-    Body.translate(helmet,{x: -2, y: 0});
+    Body.translate(helmet.body,{x: -2, y: 0});
   }
 
   fill(40);
@@ -202,14 +211,14 @@ function draw() {
 function keyPressed() {
   // is SPACE pressed?
   if (keyCode === 32 && engine.gravity.y == 0) {
-    Body.setVelocity(helmet,
+    Body.setVelocity(helmet.body,
       {x: 5.25, y: -0.5}
     );
     // Tell p5.js to prevent default behavior on Spacebar press (scrolling)
     return(false);
   } else {
-    Body.applyForce(helmet,
-      {x: helmet.position.x, y: helmet.position.y},
+    Body.applyForce(helmet.body,
+      {x: helmet.body.position.x, y: helmet.body.position.y},
       {x: 0.03, y: -0.1}
     );
   }
@@ -226,8 +235,8 @@ function scrollFollow(matterObj) {
     const $element = $('html, body');
     if ($element.is(':animated') == false) {
       $element.animate({
-        scrollLeft: helmet.position.x,
-        scrollTop: helmet.position.y
+        scrollLeft: helmet.body.position.x,
+        scrollTop: helmet.body.position.y
       }, 1000);
       marsLanding()
     }
