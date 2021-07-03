@@ -61,6 +61,11 @@ function setup() {
   spaceBackground = new Background('space', 50, 200);
   marsBackground = new Background('mars');
 
+  // Helmet
+  helmet = Bodies.circle(200, 600, helmetSprite.height / 2, {mass: 4});
+  Composite.add(world, helmet);
+
+  // ----- SPACE -----
   // Black Hole
   blackHole = Bodies.circle(1600, 1000, 200, {
     label: 'blackHole',
@@ -78,10 +83,6 @@ function setup() {
   });
   Composite.add(world, blackHole);
 
-  // Helmet
-  helmet = Bodies.circle(200, 600, helmetSprite.height / 2, {mass: 4});
-  Composite.add(world, helmet);
-
   // Comets
   let cometsCount = 5;
 
@@ -94,7 +95,25 @@ function setup() {
   }
   Composite.add(world, comets);
 
-  //marsGround
+  Events.on(engine, 'collisionStart', function(event) {
+    event.pairs.forEach(({ bodyA, bodyB }) => {
+      let objectToRemove;
+      if (bodyB == blackHole && bodyA !== blackHole) {
+        objectToRemove = bodyA;
+      } else if (bodyA == blackHole && bodyB !== blackHole) {
+        objectToRemove = bodyB;
+      }
+      if (objectToRemove) {
+        Matter.World.remove(world, objectToRemove);
+        let index = comets.indexOf(objectToRemove);
+        comets.splice(index, 1);
+        cometSprites.splice(index, 1);
+      }
+    });
+  });
+
+  // ----- MARS -----
+  // Mars ground
   marsGround = Bodies.rectangle(windowWidth * 1.5, 870, windowWidth, 20, {isStatic: true})
   Composite.add(world, marsGround);
 
@@ -128,23 +147,6 @@ function setup() {
   // Platform
   platform = Bodies.rectangle(3300, 550, 200, 30, {isStatic: true});
   Composite.add(world, platform);
-
-  Events.on(engine, 'collisionStart', function(event) {
-    event.pairs.forEach(({ bodyA, bodyB }) => {
-      let objectToRemove;
-      if (bodyB == blackHole && bodyA !== blackHole) {
-        objectToRemove = bodyA;
-      } else if (bodyA == blackHole && bodyB !== blackHole) {
-        objectToRemove = bodyB;
-      }
-      if (objectToRemove) {
-        Matter.World.remove(world, objectToRemove);
-        let index = comets.indexOf(objectToRemove);
-        comets.splice(index, 1);
-        cometSprites.splice(index, 1);
-      }
-    });
-  });
 }
 
 function draw() {
@@ -160,9 +162,17 @@ function draw() {
 
   scrollFollow(helmet)
 
+  // ----- SPACE -----
+  drawBody(blackHole);
+  for (let i = 0; i < comets.length; i++) {
+    Body.setAngle(comets[i], Vector.angle({x: 0, y: 0}, comets[i].velocity) + 1.25 * Math.PI)
+    cometSprites[i].draw(comets[i], cometSprites[i].animation[0].height / 7, -cometSprites[i].animation[0].width / 7);
+  }
+
+  // ----- MARS -----
+  //Platform logic
   fill(250);
 
-  //Platform logic
   if(reverse == false && platform.position.x < 4000) {
     Body.translate(platform, {x: +2, y: 0})
   } else if (platform.position.x == 4000 && reverse == false) {
@@ -183,16 +193,10 @@ function draw() {
   }
 
   fill(40);
-  drawBody(blackHole);
 
   drawBodies(bridge.bodies);
   drawConstraints(bridge.constraints);
   drawBodies(blockStack.bodies);
-
-  for (let i = 0; i < comets.length; i++) {
-    Body.setAngle(comets[i], Vector.angle({x: 0, y: 0}, comets[i].velocity) + 1.25 * Math.PI)
-    cometSprites[i].draw(comets[i], cometSprites[i].animation[0].height / 7, -cometSprites[i].animation[0].width / 7);
-  }
 }
 
 function keyPressed() {
