@@ -109,6 +109,12 @@ function setup() {
         for (let i = 0; i < spaceObjects.length; i++) {
           if (spaceObjects[i].body == objectToRemove) {
             spaceObjects.splice(i, 1);
+
+            let sprite = new Sprite(cometSpriteData, cometSpriteSheet, 0.075);
+            let body = Bodies.circle(random(100, windowWidth), random(0, 800), sprite.animation[0].height / 4, {angle: 1.25 * Math.PI, mass: 0.25});
+            spaceObjects.push(new Comet(body, sprite));
+            Composite.add(world, body);
+
             break;
           }          
         }
