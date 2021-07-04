@@ -114,7 +114,7 @@ function setup() {
         for (let i = 0; i < spaceObjects.length; i++) {
           if (spaceObjects[i].body == objectToRemove) {
             spaceObjects.splice(i, 1);
-            spawnDebris(random(windowWidth * 0.5, windowWidth), random(- windowHeight, 0));
+            spawnDebris(random(0, windowWidth), random(- windowHeight * 0.2, 0));
             break;
           }          
         }
