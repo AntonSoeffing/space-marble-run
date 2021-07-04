@@ -50,7 +50,7 @@ function preload() {
   starSprite = loadImage('sprites/backgrounds/space/star_3.png');
 
   // Black Hole
-  blackHoleSprite = loadImage('sprites/blacKHole.png');
+  blackHoleSprite = loadImage('sprites/blackHole.png');
 
   // Helmet
   helmetSprite = loadImage('sprites/helmet.png');
@@ -231,7 +231,7 @@ function keyPressed() {
   // is SPACE pressed?
   if (keyCode === 32 && engine.gravity.y == 0) {
     Body.setVelocity(helmet.body,
-          
+
     );
     // Tell p5.js to prevent default behavior on Spacebar press (scrolling)
     return(false);
