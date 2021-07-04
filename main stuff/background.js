@@ -2,6 +2,7 @@ class Star {
     constructor(x, y) {
         this.x = x;
         this.y = y;
+        this.size = round(random(0,2));
     }
 }
 
@@ -43,9 +44,25 @@ class Background {
                 // Draw Stars
                 push();
                 for (let i = 0; i < this.stars.length; i++) {
-                    drawingContext.globalAlpha = 0.8;
-                    image(starSprite, this.stars[i].x, this.stars[i].y);
-                    drawingContext.globalAlpha = 1;
+                    switch (this.stars[i].size) {
+                        case 0:
+                            drawingContext.globalAlpha = 0.8;
+                            image(star0Sprite, this.stars[i].x, this.stars[i].y);
+                            drawingContext.globalAlpha = 1;
+                            break;
+                        case 1:
+                            drawingContext.globalAlpha = 0.8;
+                            image(star1Sprite, this.stars[i].x, this.stars[i].y);
+                            drawingContext.globalAlpha = 1;
+                            break;
+                        case 2:
+                            drawingContext.globalAlpha = 0.8;
+                            image(star2Sprite, this.stars[i].x, this.stars[i].y);
+                            drawingContext.globalAlpha = 1;
+                            break;
+                        default:
+                            break;
+                    }
                 }
                 pop();
 

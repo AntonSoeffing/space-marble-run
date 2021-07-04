@@ -34,7 +34,9 @@ let satelliteSprite;
 
 let planetSprite;
 let moonSprite;
-let starSprite;
+let star0Sprite;
+let star1Sprite;
+let star2Sprite;
 let marsSprite;
 
 let reverse = false;
@@ -47,7 +49,9 @@ function preload() {
   // Space Background Elements
   planetSprite = loadImage('sprites/backgrounds/space/planet.png');
   moonSprite = loadImage('sprites/backgrounds/space/moon.png');
-  starSprite = loadImage('sprites/backgrounds/space/star_3.png');
+  star0Sprite = loadImage('sprites/backgrounds/space/star_0.png');
+  star1Sprite = loadImage('sprites/backgrounds/space/star_1.png');
+  star2Sprite = loadImage('sprites/backgrounds/space/star_2.png');
 
   // Black Hole
   blackHoleSprite = loadImage('sprites/blackHole.png');
@@ -71,7 +75,7 @@ function setup() {
   Runner.run(runner, engine);
 
   // Backgrounds
-  spaceBackground = new Background('space', 50, 200);
+  spaceBackground = new Background('space', 60, 200);
   marsBackground = new Background('mars');
 
   // ----- SPACE -----
