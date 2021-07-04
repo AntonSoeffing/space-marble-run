@@ -231,7 +231,7 @@ function keyPressed() {
   // is SPACE pressed?
   if (keyCode === 32 && engine.gravity.y == 0) {
     Body.setVelocity(helmet.body,
-
+      {x: 5.25, y: -0.5}
     );
     // Tell p5.js to prevent default behavior on Spacebar press (scrolling)
     return(false);
