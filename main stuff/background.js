@@ -50,7 +50,10 @@ class Background {
                 pop();
 
                 // Draw Planet
-                image(planetSprite, windowWidth * 0.8, windowHeight * 0.2);
+                image(planetSprite, windowWidth * 0.85, windowHeight * 0.2);
+               
+                // Draw Moon
+                image(moonSprite, windowWidth * 0.1, windowHeight * 0.2);
                 break;
             case 'mars':
                 background(marsSprite);

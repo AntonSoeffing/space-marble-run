@@ -20,6 +20,7 @@ let world = engine.world;
 let runner = Runner.create();
 
 let blackHole;
+let blackHoleSprite;
 
 let spaceObjects = [];
 
@@ -31,6 +32,11 @@ let cometSpriteSheet;
 
 let satelliteSprite;
 
+let planetSprite;
+let moonSprite;
+let starSprite;
+let marsSprite;
+
 let reverse = false;
 
 function preload() {
@@ -40,7 +46,11 @@ function preload() {
 
   // Space Background Elements
   planetSprite = loadImage('sprites/backgrounds/space/planet.png');
+  moonSprite = loadImage('sprites/backgrounds/space/moon.png');
   starSprite = loadImage('sprites/backgrounds/space/star_3.png');
+
+  // Black Hole
+  blackHoleSprite = loadImage('sprites/blacKHole.png');
 
   // Helmet
   helmetSprite = loadImage('sprites/helmet.png');
@@ -48,7 +58,6 @@ function preload() {
   // Comets
   cometSpriteData = loadJSON('sprites/comet_data.json');
   cometSpriteSheet = loadImage('sprites/comet_sheet.png');
-
   // Satellite
   satelliteSprite = loadImage('sprites/satellite.png');
 }
@@ -67,7 +76,7 @@ function setup() {
 
   // ----- SPACE -----
   // Black Hole
-  blackHole = Bodies.circle(1600, 1000, 200, {
+  blackHole = Bodies.circle(windowWidth * 0.6, windowHeight * 0.9, 20, {
     label: 'blackHole',
     isStatic: true,
     plugin: {
@@ -171,7 +180,7 @@ function draw() {
   scrollFollow(helmet.body);
 
   // ----- SPACE -----
-  drawBody(blackHole);
+  drawSprite(blackHole, blackHoleSprite);
 
   for (let i = 0; i < spaceObjects.length; i++) {
     if (spaceObjects[i] instanceof Comet) {
@@ -222,7 +231,7 @@ function keyPressed() {
   // is SPACE pressed?
   if (keyCode === 32 && engine.gravity.y == 0) {
     Body.setVelocity(helmet.body,
-      {x: 5.25, y: -0.5}
+          
     );
     // Tell p5.js to prevent default behavior on Spacebar press (scrolling)
     return(false);
