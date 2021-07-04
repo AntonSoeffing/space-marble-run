@@ -29,6 +29,8 @@ let helmetSprite;
 let cometSpriteData;
 let cometSpriteSheet;
 
+let satelliteSprite;
+
 let reverse = false;
 
 function preload() {
@@ -46,6 +48,9 @@ function preload() {
   // Comets
   cometSpriteData = loadJSON('sprites/comet_data.json');
   cometSpriteSheet = loadImage('sprites/comet_sheet.png');
+
+  // Satellite
+  satelliteSprite = loadImage('sprites/satellite.png');
 }
 
 function setup() {
@@ -109,12 +114,7 @@ function setup() {
         for (let i = 0; i < spaceObjects.length; i++) {
           if (spaceObjects[i].body == objectToRemove) {
             spaceObjects.splice(i, 1);
-
-            let sprite = new Sprite(cometSpriteData, cometSpriteSheet, 0.075);
-            let body = Bodies.circle(random(100, windowWidth), random(0, 800), sprite.animation[0].height / 4, {angle: 1.25 * Math.PI, mass: 0.25});
-            spaceObjects.push(new Comet(body, sprite));
-            Composite.add(world, body);
-
+            spawnDebris(random(windowWidth * 0.5, windowWidth), random(- windowHeight, 0));
             break;
           }          
         }
@@ -176,11 +176,15 @@ function draw() {
   for (let i = 0; i < spaceObjects.length; i++) {
     if (spaceObjects[i] instanceof Comet) {
       // Comet
-      Body.setAngle(spaceObjects[i].body, Vector.angle({x: 0, y: 0}, spaceObjects[i].body.velocity) + 1.25 * Math.PI)
+      Body.setAngle(spaceObjects[i].body, Vector.angle({x: 0, y: 0}, spaceObjects[i].body.velocity) + 1.25 * Math.PI);
       spaceObjects[i].sprite.draw(spaceObjects[i].body, spaceObjects[i].sprite.animation[0].height / 7, -spaceObjects[i].sprite.animation[0].width / 7);
+    } else if (spaceObjects[i] instanceof Satellite) {
+      // Satellite
+      drawSprite(spaceObjects[i].body, spaceObjects[i].sprite);
+      //Matter.Body.rotate(spaceObjects[i].body, 0.05);
     } else if (spaceObjects[i] instanceof Helmet) {
       // Helmet
-      drawSprite(spaceObjects[i].body, spaceObjects[i].sprite)
+      drawSprite(spaceObjects[i].body, spaceObjects[i].sprite);
     }
   }
 
@@ -234,6 +238,28 @@ function marsLanding() {
   engine.gravity.y = 1;
   Composite.remove(world, blackHole)
   Composite.add(world, blockStack);
+}
+
+function spawnDebris(x, y) {
+  //console.log('There appears to be a...');
+  switch (round(random(0, 1))) {
+    case 0:
+        //console.log('New Comet!');
+        let sprite = new Sprite(cometSpriteData, cometSpriteSheet, 0.075);
+        let body = Bodies.circle(x, y, sprite.animation[0].height / 4, {angle: 1.25 * Math.PI, mass: 0.25});
+        spaceObjects.push(new Comet(body, sprite));
+        Composite.add(world, body);
+        break;
+      case 1:
+        //console.log('New Satellite!');
+        satelliteBody = Bodies.rectangle(x, y, satelliteSprite.width, satelliteSprite.height, {torque: random(-100, 100), mass: 0.2});
+        spaceObjects.push(new Satellite(satelliteBody, satelliteSprite));
+        Composite.add(world, satelliteBody);
+        break;
+    default:
+      break;
+  }
+  
 }
 
 function scrollFollow(matterObj) {
