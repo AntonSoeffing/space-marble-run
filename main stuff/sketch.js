@@ -39,7 +39,20 @@ let star1Sprite;
 let star2Sprite;
 let marsSprite;
 
-let reverse = false;
+let platforms = [];
+let platformCount = 5;
+let platformXCord;
+let platformYCord = 780;
+let onPlatform;
+let reverseOdd = false;
+let reverseEven = false;
+
+let wallXCord = 3100;
+
+let projectiles = []
+let projectilesCount = 50;
+let projectileNumber = 0;
+let shootingEnemy = false;
 
 function preload() {
   // Preload images
@@ -64,10 +77,13 @@ function preload() {
   cometSpriteSheet = loadImage('sprites/comet_sheet.png');
   // Satellite
   satelliteSprite = loadImage('sprites/satellite.png');
+
+  // Ufo
+  ufoSprite = loadImage('sprites/Ufo.png')
 }
 
 function setup() {
-  createCanvas(windowWidth * 2, windowHeight);
+  createCanvas(windowWidth * 4, windowHeight);
 
   engine.gravity.y = 0;
 
@@ -101,7 +117,7 @@ function setup() {
   Composite.add(world, helmetBody);
   helmet = new Helmet(helmetBody, helmetSprite);
   spaceObjects.push(helmet);
-  
+
   // Comets
   let spaceObjectsCount = 5;
 
@@ -129,7 +145,7 @@ function setup() {
             spaceObjects.splice(i, 1);
             spawnDebris(random(0, windowWidth), random(- windowHeight * 0.2, 0));
             break;
-          }          
+          }
         }
       }
     });
@@ -137,8 +153,11 @@ function setup() {
 
   // ----- MARS -----
   // Mars ground
-  marsGround = Bodies.rectangle(windowWidth * 1.5, 870, windowWidth, 20, {isStatic: true})
+  marsGround = Bodies.rectangle(windowWidth * 1.5 , 870, windowWidth, 20, {isStatic: true})
   Composite.add(world, marsGround);
+
+  marsGround2 = Bodies.rectangle(windowWidth * 2.5 , 870, windowWidth, 20, {isStatic: true})
+  Composite.add(world, marsGround2);
 
   // Bridge
   const group = Body.nextGroup(true);
@@ -163,13 +182,37 @@ function setup() {
   }));
 
   // Stack of blocks
-  blockStack = Composites.stack(2800, 570, 3, 20, 3, 3, function(x, y) {
+  blockStack = Composites.stack(5800, 570, 3, 20, 3, 3, function(x, y) {
     return Bodies.rectangle(x, y, 20, 20);
   });
 
-  // Platform
-  platform = Bodies.rectangle(3300, 550, 200, 30, {isStatic: true});
-  Composite.add(world, platform);
+  // Platforms
+  for (let i = 0; i < platformCount; i++) {
+    if (i % 2 == 0) {
+      platformXCord = 2600;
+    } else {
+      platformXCord = 3000;
+    }
+    platforms[i] = Bodies.rectangle(platformXCord, platformYCord, 150, 15 , {isStatic: true});
+    platformYCord -= 100
+  }
+  Composite.add(world, platforms);
+
+  //Wall
+  obstacleWall = Bodies.rectangle(wallXCord, 590 , 20, 550, {isStatic: true})
+  Composite.add(world, obstacleWall);
+
+  //Ramp
+  ramp = Bodies.fromVertices(wallXCord-110 , 850, [{ x: 3000, y: 870}, { x: 2700, y: 870 }, { x: 3000, y: 830 }])
+  Composite.add(world, ramp);
+
+  //UFO
+  ufo = Bodies.circle(windowWidth*2.5, 150, 50, {isStatic: true});
+  Composite.add(world, ufo);
+
+  for (let i = 0; i < projectilesCount; i++) {
+    projectiles[i] = Bodies.circle(windowWidth * 2.5, 200, 5, {isStatic: true, mass: 4})
+  }
 }
 
 function draw() {
@@ -205,23 +248,56 @@ function draw() {
   //Platform logic
   fill(250);
 
-  if(reverse == false && platform.position.x < 4000) {
-    Body.translate(platform, {x: +2, y: 0})
-  } else if (platform.position.x == 4000 && reverse == false) {
-    reverse = true;
-  } else if (reverse == true && platform.position.x > 3300) {
-    Body.translate(platform, {x: -2, y: 0})
-  } else if (platform.position.x == 3300 && reverse == true) {
-    reverse = false;
+  let countingUp = [0,1,2,3,4]
+
+  countingUp.forEach(countingUp => {
+    if(countingUp % 2 == 0 && reverseEven == false && platforms[0].position.x < 3000) {
+      Body.translate(platforms[countingUp], {x: +2, y: 0})
+    } else if (countingUp % 2 == 0 && reverseEven == true && platforms[0].position.x > 2600) {
+      Body.translate(platforms[countingUp], {x: -2, y: 0})
+    } else if (countingUp % 2 != 0 && reverseOdd == false && platforms[1].position.x < 3000) {
+      Body.translate(platforms[countingUp], {x: +2, y: 0})
+    } else if (countingUp % 2 != 0 && reverseOdd == true && platforms[1].position.x > 2600) {
+      Body.translate(platforms[countingUp], {x: -2, y: 0})
+    } else if (platforms[0].position.x == 3000) {
+      reverseEven = true;
+    } else if (platforms[0].position.x == 2600) {
+      reverseEven = false;
+    } else if (platforms[1].position.x == 3000) {
+      reverseOdd = true;
+    } else if (platforms[1].position.x == 2600) {
+      reverseOdd = false;
+    }
+
+    onPlatform = Matter.SAT.collides(helmetBody, platforms[countingUp]);
+
+    if(countingUp % 2 == 0 && onPlatform.collided && reverseEven == false) {
+      Body.translate(helmetBody,{x: 2, y: 0});
+    } else if (countingUp % 2 == 0 && onPlatform.collided && reverseEven == true) {
+      Body.translate(helmetBody,{x: -2, y: 0});
+    } else if (countingUp % 2 != 0 && onPlatform.collided && reverseOdd == true) {
+      Body.translate(helmetBody,{x: -2, y: 0});
+    } else if (countingUp % 2 != 0 && onPlatform.collided && reverseOdd == false) {
+      Body.translate(helmetBody,{x: +2, y: 0});
+    }
+  });
+
+  for (let i = 0; i < platformCount; i++) {
+    drawBody(platforms[i]);
   }
-  drawBody(platform);
 
-  let onPlatform = Matter.SAT.collides(helmet.body, platform);
+  drawBody(obstacleWall)
+  drawBody(ramp)
 
-  if(onPlatform.collided && reverse == false) {
-    Body.translate(helmet.body,{x: 2, y: 0});
-  } else if (onPlatform.collided && reverse == true) {
-    Body.translate(helmet.body,{x: -2, y: 0});
+  // UFO Logic
+  fill('red')
+  drawBodies(projectiles)
+  drawSprite(ufo, ufoSprite)
+
+  onEnemyTerritory = Matter.SAT.collides(helmetBody, marsGround2);
+
+  if(onEnemyTerritory.collided && shootingEnemy == false) {
+      projectileRelease();
   }
 
   fill(40);
@@ -250,7 +326,22 @@ function keyPressed() {
 function marsLanding() {
   engine.gravity.y = 1;
   Composite.remove(world, blackHole)
-  Composite.add(world, blockStack);
+  if(helmetBody.position.x < windowWidth*2) {
+    Composite.add(world, blockStack);
+  }
+}
+
+function projectileRelease() {
+  shootingEnemy = true;
+  if (projectileNumber < projectilesCount) {
+    setTimeout(function() {
+      Matter.Body.setStatic(projectiles[projectileNumber], false)
+      Composite.add(world, projectiles[projectileNumber])
+      Body.setVelocity(projectiles[projectileNumber], {x: -(ufo.position.x - helmetBody.position.x)*0.05, y: -(ufo.position.y - helmetBody.position.y)*0.05})
+      projectileNumber++
+      projectileRelease()
+    }, 1000)
+  }
 }
 
 function spawnDebris(x, y) {
@@ -272,7 +363,7 @@ function spawnDebris(x, y) {
     default:
       break;
   }
-  
+
 }
 
 function scrollFollow(matterObj) {
