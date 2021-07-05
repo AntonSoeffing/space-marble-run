@@ -42,12 +42,10 @@ let marsSprite;
 let platforms = [];
 let platformCount = 5;
 let platformXCord;
-let platformYCord = 780;
+let platformYCord;
 let onPlatform;
 let reverseOdd = false;
 let reverseEven = false;
-
-let wallXCord = 3100;
 
 let projectiles = []
 let projectilesCount = 50;
@@ -57,7 +55,7 @@ let shootingEnemy = false;
 function preload() {
   // Preload images
   // Mars Background
-  marsSprite = loadImage('sprites/backgrounds/mars/mars.png');
+  marsSprite = loadImage('sprites/backgrounds/mars/mars3.png');
 
   // Space Background Elements
   planetSprite = loadImage('sprites/backgrounds/space/planet.png');
@@ -80,10 +78,14 @@ function preload() {
 
   // Ufo
   ufoSprite = loadImage('sprites/Ufo.png')
+
+  //Platform
+  platformSprite = loadImage('sprites/plattform.png')
 }
 
 function setup() {
   createCanvas(windowWidth * 4, windowHeight);
+  pixelDensity(1)
 
   engine.gravity.y = 0;
 
@@ -153,61 +155,61 @@ function setup() {
 
   // ----- MARS -----
   // Mars ground
-  marsGround = Bodies.rectangle(windowWidth * 1.5 , 870, windowWidth, 20, {isStatic: true})
+  marsGround = Bodies.rectangle(windowWidth * 1.5 , windowHeight * 0.82, windowWidth, 20, {isStatic: true})
   Composite.add(world, marsGround);
 
-  marsGround2 = Bodies.rectangle(windowWidth * 2.5 , 870, windowWidth, 20, {isStatic: true})
+  marsGround2 = Bodies.rectangle(windowWidth * 2.5 , windowHeight * 0.82, windowWidth, 20, {isStatic: true})
   Composite.add(world, marsGround2);
 
   // Bridge
   const group = Body.nextGroup(true);
-  const rects = Composites.stack(3200, 750, 10, 1, 10, 10, function(x, y) {
-      return Bodies.rectangle(x, y, 50, 20, { collisionFilter: { group: group } });
+  const rects = Composites.stack(windowWidth*1.6, windowHeight*0.3, 15, 1, 10, 10, function(x, y) {
+      return Bodies.rectangle(x, y, windowWidth*0.03, 20, { collisionFilter: { group: group } });
   });
-  bridge = Composites.chain(rects, 0.5, 0, -0.5, 0, {stiffness: 0.8, length: 2, render: {type: 'line'}});
-  Composite.add(world, [bridge]);
+  bridge = Composites.chain(rects, 0.5, 0, -0.5, 0, {stiffness: 1, length: 2, render: {type: 'line'}});
 
   // left and right fix point of bridge
   Composite.add(rects, Constraint.create({
-    pointA: {x: 3200, y: 750},
+    pointA: {x: windowWidth*1.6, y: windowHeight*0.3},
     bodyB: rects.bodies[0],
     pointB: {x: -25, y: 0},
     stiffness: 0.1
   }));
   Composite.add(rects, Constraint.create({
-    pointA: {x: 3800, y: 750},
+    pointA: {x: windowWidth*2.3, y: windowHeight*0.7},
     bodyB: rects.bodies[rects.bodies.length-1],
     pointB: {x: +25, y: 0},
     stiffness: 0.02
   }));
 
   // Stack of blocks
-  blockStack = Composites.stack(5800, 570, 3, 20, 3, 3, function(x, y) {
+  blockStack = Composites.stack(windowWidth*2.8, windowHeight * 0.55 , 3, 20, 3, 3, function(x, y) {
     return Bodies.rectangle(x, y, 20, 20);
   });
 
   // Platforms
+  platformYCord = windowHeight * 0.74
   for (let i = 0; i < platformCount; i++) {
     if (i % 2 == 0) {
-      platformXCord = 2600;
+      platformXCord = windowWidth * 1.25;
     } else {
-      platformXCord = 3000;
+      platformXCord = windowWidth * 1.6;
     }
-    platforms[i] = Bodies.rectangle(platformXCord, platformYCord, 150, 15 , {isStatic: true});
-    platformYCord -= 100
+    platforms[i] = Bodies.rectangle(platformXCord, platformYCord, 200, 29 , {isStatic: true});
+    platformYCord -= windowHeight*0.07
   }
   Composite.add(world, platforms);
 
-  //Wall
-  obstacleWall = Bodies.rectangle(wallXCord, 590 , 20, 550, {isStatic: true})
+  /*Wall
+  obstacleWall = Bodies.rectangle(windowWidth * 1.45, windowHeight * 0.6, 20, windowWidth*0.22 , {isStatic: true})
   Composite.add(world, obstacleWall);
 
   //Ramp
-  ramp = Bodies.fromVertices(wallXCord-110 , 850, [{ x: 3000, y: 870}, { x: 2700, y: 870 }, { x: 3000, y: 830 }])
-  Composite.add(world, ramp);
+  ramp = Bodies.fromVertices(windowWidth * 1.399, windowHeight * 0.801, [{ x: windowWidth * 1.49, y: windowHeight * 0.82}, { x: windowWidth * 1.35 , y: windowHeight * 0.82 }, { x: windowWidth * 1.49, y: windowHeight * 0.79 }], {isStatic: true})
+  Composite.add(world, ramp);*/
 
   //UFO
-  ufo = Bodies.circle(windowWidth*2.5, 150, 50, {isStatic: true});
+  ufo = Bodies.circle(windowWidth*2.5, windowHeight*0.15, 50, {isStatic: true});
   Composite.add(world, ufo);
 
   for (let i = 0; i < projectilesCount; i++) {
@@ -251,21 +253,21 @@ function draw() {
   let countingUp = [0,1,2,3,4]
 
   countingUp.forEach(countingUp => {
-    if(countingUp % 2 == 0 && reverseEven == false && platforms[0].position.x < 3000) {
+    if(countingUp % 2 == 0 && reverseEven == false && platforms[0].position.x < windowWidth * 1.6) {
       Body.translate(platforms[countingUp], {x: +2, y: 0})
-    } else if (countingUp % 2 == 0 && reverseEven == true && platforms[0].position.x > 2600) {
+    } else if (countingUp % 2 == 0 && reverseEven == true && platforms[0].position.x > windowWidth * 1.25) {
       Body.translate(platforms[countingUp], {x: -2, y: 0})
-    } else if (countingUp % 2 != 0 && reverseOdd == false && platforms[1].position.x < 3000) {
+    } else if (countingUp % 2 != 0 && reverseOdd == false && platforms[1].position.x < windowWidth * 1.6) {
       Body.translate(platforms[countingUp], {x: +2, y: 0})
-    } else if (countingUp % 2 != 0 && reverseOdd == true && platforms[1].position.x > 2600) {
+    } else if (countingUp % 2 != 0 && reverseOdd == true && platforms[1].position.x > windowWidth * 1.25) {
       Body.translate(platforms[countingUp], {x: -2, y: 0})
-    } else if (platforms[0].position.x == 3000) {
+    } else if (platforms[0].position.x == windowWidth * 1.6) {
       reverseEven = true;
-    } else if (platforms[0].position.x == 2600) {
+    } else if (platforms[0].position.x == windowWidth * 1.25) {
       reverseEven = false;
-    } else if (platforms[1].position.x == 3000) {
+    } else if (platforms[1].position.x == windowWidth * 1.6) {
       reverseOdd = true;
-    } else if (platforms[1].position.x == 2600) {
+    } else if (platforms[1].position.x == windowWidth * 1.25) {
       reverseOdd = false;
     }
 
@@ -283,11 +285,8 @@ function draw() {
   });
 
   for (let i = 0; i < platformCount; i++) {
-    drawBody(platforms[i]);
+    drawSprite(platforms[i], platformSprite);
   }
-
-  drawBody(obstacleWall)
-  drawBody(ramp)
 
   // UFO Logic
   fill('red')
@@ -311,7 +310,7 @@ function keyPressed() {
   // is SPACE pressed?
   if (keyCode === 32 && engine.gravity.y == 0) {
     Body.setVelocity(helmet.body,
-      {x: 5.25, y: -0.5}
+      {x: 15.25, y: -0.5}
     );
     // Tell p5.js to prevent default behavior on Spacebar press (scrolling)
     return(false);
@@ -328,6 +327,7 @@ function marsLanding() {
   Composite.remove(world, blackHole)
   if(helmetBody.position.x < windowWidth*2) {
     Composite.add(world, blockStack);
+    Composite.add(world, [bridge]);
   }
 }
 
