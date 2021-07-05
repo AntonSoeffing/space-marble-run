@@ -155,11 +155,14 @@ function setup() {
 
   // ----- MARS -----
   // Mars ground
-  marsGround = Bodies.rectangle(windowWidth * 1.5 , windowHeight * 0.82, windowWidth, 20, {isStatic: true})
+  marsGround = Bodies.rectangle(windowWidth * 1.105 , windowHeight * 0.82, windowWidth*0.21, 20, {isStatic: true})
   Composite.add(world, marsGround);
 
   marsGround2 = Bodies.rectangle(windowWidth * 2.5 , windowHeight * 0.82, windowWidth, 20, {isStatic: true})
   Composite.add(world, marsGround2);
+
+  marsGround3 = Bodies.rectangle(windowWidth * 3.5 , windowHeight * 0.82, windowWidth, 20, {isStatic: true})
+  Composite.add(world, marsGround3);
 
   // Bridge
   const group = Body.nextGroup(true);
@@ -213,7 +216,7 @@ function setup() {
   Composite.add(world, ufo);
 
   for (let i = 0; i < projectilesCount; i++) {
-    projectiles[i] = Bodies.circle(windowWidth * 2.5, 200, 5, {isStatic: true, mass: 4})
+    projectiles[i] = Bodies.circle(windowWidth * 2.5, 200, 7, {isStatic: true, mass: 4})
   }
 }
 
@@ -296,7 +299,13 @@ function draw() {
   onEnemyTerritory = Matter.SAT.collides(helmetBody, marsGround2);
 
   if(onEnemyTerritory.collided && shootingEnemy == false) {
-      projectileRelease();
+    shootingEnemy = true;
+    projectileRelease();
+  }
+
+  offEnemyTerritory = Matter.SAT.collides(helmetBody, marsGround3);
+  if(offEnemyTerritory.collided) {
+    shootingEnemy = false;
   }
 
   fill(40);
@@ -325,22 +334,21 @@ function keyPressed() {
 function marsLanding() {
   engine.gravity.y = 1;
   Composite.remove(world, blackHole)
-  if(helmetBody.position.x < windowWidth*2) {
+  if(helmetBody.position.x < windowWidth*1.2) {
     Composite.add(world, blockStack);
     Composite.add(world, [bridge]);
   }
 }
 
 function projectileRelease() {
-  shootingEnemy = true;
-  if (projectileNumber < projectilesCount) {
+  if (projectileNumber < projectilesCount && shootingEnemy == true) {
     setTimeout(function() {
       Matter.Body.setStatic(projectiles[projectileNumber], false)
       Composite.add(world, projectiles[projectileNumber])
-      Body.setVelocity(projectiles[projectileNumber], {x: -(ufo.position.x - helmetBody.position.x)*0.05, y: -(ufo.position.y - helmetBody.position.y)*0.05})
+      Body.setVelocity(projectiles[projectileNumber], {x: -(ufo.position.x - helmetBody.position.x)*0.04, y: -(ufo.position.y - helmetBody.position.y)*0.04})
       projectileNumber++
       projectileRelease()
-    }, 1000)
+    }, 1300)
   }
 }
 
