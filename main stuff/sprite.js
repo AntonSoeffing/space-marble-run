@@ -1,5 +1,5 @@
 class Sprite {
-    constructor(spriteData, spriteSheet, speed) {
+    constructor(spriteData, spriteSheet, speed = 0.5) {
         this.spriteData = spriteData;
         this.spriteSheet = spriteSheet;
         this.animation = [];
@@ -16,17 +16,28 @@ class Sprite {
         }
     }
        
-    draw(body, offsetX, offsetY) {    
+    drawAnimation(body, offsetX, offsetY) {    
         const pos = body.position;
         const angle = body.angle;
         
-        push();
         this.index += this.speed;
         let index = floor(this.index) % this.animation.length;
+        push();
         translate(pos.x, pos.y);
         rotate(angle);
         imageMode(CENTER);
         image(this.animation[index], offsetX, offsetY);
         pop();
+    }
+
+    drawFrame(frame = 0, x, y, angle = 0) {
+        this.angle = angle;
+        push();
+        imageMode(CENTER);
+        translate(x, y);
+        rotate(this.angle);
+        image(this.animation[frame], 0, 0);
+        pop();
+        
     }
 }
