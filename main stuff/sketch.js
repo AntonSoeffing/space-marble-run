@@ -83,6 +83,9 @@ function preload() {
 
   //Platform
   platformSprite = loadImage('sprites/plattform.png')
+
+  //Astronaut
+  astronautNoHelmetSprite = loadImage('sprites/astronaut_no_helmet.png')
 }
 
 function setup() {
@@ -222,6 +225,9 @@ function setup() {
   catapultSupportRight = Bodies.rectangle(windowWidth*3.42, windowHeight * 0.7, 80, 120)
   catapult = Bodies.rectangle(windowWidth*3.4, windowHeight * 0.65, 600, 20)
   catapultActivator = Bodies.circle(windowWidth*3.5, -300, 100);
+
+  //Astronaut
+  astronautNoHelmet = Bodies.rectangle(windowWidth*3.8 , windowHeight * 0.71, 80, 180)
 }
 
 function draw() {
@@ -318,6 +324,8 @@ function draw() {
   drawBody(catapult)
   drawBody(catapultActivator)
 
+  drawSprite(astronautNoHelmet, astronautNoHelmetSprite)
+
   onCatapult = Matter.SAT.collides(helmetBody, catapult)
 
   if(onCatapult.collided && catapultOnlyOnce == true) {
@@ -339,7 +347,7 @@ function keyPressed() {
     // Tell p5.js to prevent default behavior on Spacebar press (scrolling)
     return(false);
     //&& helmetBody.velocity.y < 0.05 && helmetBody.velocity.y > -0.05
-  } else if (keyCode === 32 && engine.gravity.y == 1 && shootingEnemy == false) {
+  } else if (keyCode === 32 && engine.gravity.y == 1 && shootingEnemy == false ) {
     Body.applyForce(helmet.body,
       {x: helmet.body.position.x, y: helmet.body.position.y},
       {x: 0.035, y: -0.15}
@@ -362,6 +370,7 @@ function marsLanding() {
     Composite.add(world, catapultSupportLeft);
     Composite.add(world, catapultSupportRight);
     Composite.add(world, catapult);
+    Composite.add(world, astronautNoHelmet);
   }
 }
 
