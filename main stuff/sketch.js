@@ -46,7 +46,22 @@ let marsSprite;
 let pixelFont;
 
 let scene = 'intro';
+
 let reverse = false;
+let platforms = [];
+let platformCount = 5;
+let platformXCord;
+let platformYCord;
+let onPlatform;
+let reverseOdd = false;
+let reverseEven = false;
+
+let projectiles = []
+let projectilesCount = 50;
+let projectileNumber = 0;
+let shootingEnemy = false;
+
+let catapultOnlyOnce = true;
 
 function preload() {
   // Preload images
@@ -55,10 +70,10 @@ function preload() {
   rocketSpriteSheet = loadImage('sprites/rocket_sheet.png');
 
   // Mars Background
-  marsSprite = loadImage('sprites/backgrounds/mars/mars.png');
+  marsSprite = loadImage('sprites/backgrounds/mars/mars3.png');
 
   // Space Background Elements
-  planetSprite = loadImage('sprites/backgrounds/space/planet.png');
+  planetSprite = loadImage('sprites/backgrounds/space/mars_in_space.png');
   moonSprite = loadImage('sprites/backgrounds/space/moon.png');
   star0Sprite = loadImage('sprites/backgrounds/space/star_0.png');
   star1Sprite = loadImage('sprites/backgrounds/space/star_1.png');
@@ -76,12 +91,21 @@ function preload() {
   // Satellite
   satelliteSprite = loadImage('sprites/satellite.png');
 
+  // Ufo
+  ufoSprite = loadImage('sprites/Ufo.png')
+  
+  //Platform
+  platformSprite = loadImage('sprites/plattform.png')
+  
+  //Astronaut
+  astronautNoHelmetSprite = loadImage('sprites/astronaut_no_helmet.png')
+  
   // Preload fonts
   pixelFont = loadFont('fonts/pixelFont.ttf');
 }
 
 function setup() {
-  createCanvas(windowWidth * 2, windowHeight);
+  createCanvas(windowWidth * 4, windowHeight);
 
   engine.gravity.y = 0;
 
@@ -118,7 +142,7 @@ function setup() {
   Composite.add(world, helmetBody);
   helmet = new Helmet(helmetBody, helmetSprite);
   spaceObjects.push(helmet);
-  
+
   // Comets
   let spaceObjectsCount = 5;
 
@@ -146,7 +170,7 @@ function setup() {
             spaceObjects.splice(i, 1);
             spawnDebris(random(0, windowWidth), random(- windowHeight * 0.2, 0));
             break;
-          }          
+          }
         }
       }
     });
@@ -154,44 +178,79 @@ function setup() {
 
   // ----- MARS -----
   // Mars ground
-  marsGround = Bodies.rectangle(windowWidth * 1.5, 870, windowWidth, 20, {isStatic: true})
+  marsGround = Bodies.rectangle(windowWidth * 1.105 , windowHeight * 0.82, windowWidth*0.21, 20, {isStatic: true})
   Composite.add(world, marsGround);
+
+  marsGround2 = Bodies.rectangle(windowWidth * 2.5 , windowHeight * 0.82, windowWidth, 20, {isStatic: true})
+  Composite.add(world, marsGround2);
+
+  marsGround3 = Bodies.rectangle(windowWidth * 3.5 , windowHeight * 0.82, windowWidth, 20, {isStatic: true})
+  Composite.add(world, marsGround3);
 
   // Bridge
   const group = Body.nextGroup(true);
-  const rects = Composites.stack(3200, 750, 10, 1, 10, 10, function(x, y) {
-      return Bodies.rectangle(x, y, 50, 20, { collisionFilter: { group: group } });
+  const rects = Composites.stack(windowWidth*1.6, windowHeight*0.36, 15, 1, 10, 10, function(x, y) {
+      return Bodies.rectangle(x, y, windowWidth*0.03, 20, { collisionFilter: { group: group } });
   });
-  bridge = Composites.chain(rects, 0.5, 0, -0.5, 0, {stiffness: 0.8, length: 2, render: {type: 'line'}});
-  Composite.add(world, [bridge]);
+  bridge = Composites.chain(rects, 0.5, 0, -0.5, 0, {stiffness: 1, length: 2, render: {type: 'line'}});
 
   // left and right fix point of bridge
   Composite.add(rects, Constraint.create({
-    pointA: {x: 3200, y: 750},
+    pointA: {x: windowWidth*1.6, y: windowHeight*0.37},
     bodyB: rects.bodies[0],
     pointB: {x: -25, y: 0},
     stiffness: 0.1
   }));
   Composite.add(rects, Constraint.create({
-    pointA: {x: 3800, y: 750},
+    pointA: {x: windowWidth*2.3, y: windowHeight*0.75},
     bodyB: rects.bodies[rects.bodies.length-1],
     pointB: {x: +25, y: 0},
     stiffness: 0.02
   }));
 
+  // Platforms
+  platformYCord = windowHeight * 0.78
+  for (let i = 0; i < platformCount; i++) {
+    if (i % 2 == 0) {
+      platformXCord = windowWidth * 1.25;
+    } else {
+      platformXCord = windowWidth * 1.6;
+    }
+    platforms[i] = Bodies.rectangle(platformXCord, platformYCord, 200, 29 , {isStatic: true});
+    platformYCord -= windowHeight*0.08
+  }
+  Composite.add(world, platforms);
+
+  //Wall
+  obstacleWall = Bodies.rectangle(windowWidth*1.6, windowHeight * 0.59,  20, windowWidth*0.22, {isStatic: true})
+  Composite.add(world, obstacleWall);
+
+  //UFO
+  ufo = Bodies.circle(windowWidth*2.5, windowHeight*0.15, 50, {isStatic: true});
+  Composite.add(world, ufo);
+
+  for (let i = 0; i < projectilesCount; i++) {
+    projectiles[i] = Bodies.circle(windowWidth * 2.5, 200, 7, {isStatic: true, mass: 4})
+  }
+
   // Stack of blocks
-  blockStack = Composites.stack(2800, 570, 3, 20, 3, 3, function(x, y) {
+  blockStack = Composites.stack(windowWidth*2.8, 0 , 3, 80, 3, 3, function(x, y) {
     return Bodies.rectangle(x, y, 20, 20);
   });
 
-  // Platform
-  platform = Bodies.rectangle(3300, 550, 200, 30, {isStatic: true});
-  Composite.add(world, platform);
+  // Catapult
+  catapultSupportLeft = Bodies.rectangle(windowWidth*3.31 , windowHeight * 0.7, 80, 120)
+  catapultSupportRight = Bodies.rectangle(windowWidth*3.42, windowHeight * 0.7, 80, 120)
+  catapult = Bodies.rectangle(windowWidth*3.4, windowHeight * 0.65, 600, 20)
+  catapultActivator = Bodies.circle(windowWidth*3.5, -300, 100);
+
+  //Astronaut
+  astronautNoHelmet = Bodies.rectangle(windowWidth*3.8 , windowHeight * 0.71, 80, 180)
 }
 
 function draw() {
   frameRate(60);
-  
+
   switch (scene) {
     case 'intro':
       introScene();
@@ -223,54 +282,108 @@ function draw() {
           drawSprite(spaceObjects[i].body, spaceObjects[i].sprite);
         }
       }
-
       // ----- MARS -----
       //Platform logic
       fill(250);
 
-      if(reverse == false && platform.position.x < 4000) {
-        Body.translate(platform, {x: +2, y: 0})
-      } else if (platform.position.x == 4000 && reverse == false) {
-        reverse = true;
-      } else if (reverse == true && platform.position.x > 3300) {
-        Body.translate(platform, {x: -2, y: 0})
-      } else if (platform.position.x == 3300 && reverse == true) {
-        reverse = false;
+      let countingUp = [0,1,2,3,4]
+
+      countingUp.forEach(countingUp => {
+        if(countingUp % 2 == 0 && reverseEven == false && platforms[0].position.x < windowWidth * 1.6) {
+          Body.translate(platforms[countingUp], {x: +4, y: 0})
+        } else if (countingUp % 2 == 0 && reverseEven == true && platforms[0].position.x > windowWidth * 1.25) {
+          Body.translate(platforms[countingUp], {x: -4, y: 0})
+        } else if (countingUp % 2 != 0 && reverseOdd == false && platforms[1].position.x < windowWidth * 1.6) {
+          Body.translate(platforms[countingUp], {x: +4, y: 0})
+        } else if (countingUp % 2 != 0 && reverseOdd == true && platforms[1].position.x > windowWidth * 1.25) {
+          Body.translate(platforms[countingUp], {x: -4, y: 0})
+        } else if (platforms[0].position.x == windowWidth * 1.6) {
+          reverseEven = true;
+        } else if (platforms[0].position.x == windowWidth * 1.25) {
+          reverseEven = false;
+        } else if (platforms[1].position.x == windowWidth * 1.6) {
+          reverseOdd = true;
+        } else if (platforms[1].position.x == windowWidth * 1.25) {
+          reverseOdd = false;
+        }
+
+        onPlatform = Matter.SAT.collides(helmetBody, platforms[countingUp]);
+
+        if(countingUp % 2 == 0 && onPlatform.collided && reverseEven == false) {
+          Body.translate(helmetBody,{x: 4, y: 0});
+        } else if (countingUp % 2 == 0 && onPlatform.collided && reverseEven == true) {
+          Body.translate(helmetBody,{x: -4, y: 0});
+        } else if (countingUp % 2 != 0 && onPlatform.collided && reverseOdd == true) {
+          Body.translate(helmetBody,{x: -4, y: 0});
+        } else if (countingUp % 2 != 0 && onPlatform.collided && reverseOdd == false) {
+          Body.translate(helmetBody,{x: +4, y: 0});
+        }
+      });
+
+      for (let i = 0; i < platformCount; i++) {
+        drawSprite(platforms[i], platformSprite);
       }
-      drawBody(platform);
 
-      let onPlatform = Matter.SAT.collides(helmet.body, platform);
+      // UFO Logic
+      fill('red')
+      drawBodies(projectiles)
+      drawSprite(ufo, ufoSprite)
 
-      if(onPlatform.collided && reverse == false) {
-        Body.translate(helmet.body,{x: 2, y: 0});
-      } else if (onPlatform.collided && reverse == true) {
-        Body.translate(helmet.body,{x: -2, y: 0});
+
+      if(helmetBody.position.x > windowWidth * 2 && helmetBody.position.x < windowWidth * 3 && shootingEnemy == false) {
+        shootingEnemy = true;
+        projectileRelease();
+      }
+
+      if(helmetBody.position.x > windowWidth * 3) {
+        shootingEnemy = false;
       }
 
       fill(40);
 
+      drawBody(obstacleWall)
+      drawBody(catapultSupportLeft)
+      drawBody(catapultSupportRight)
+      drawBody(catapult)
+      drawBody(catapultActivator)
+
+      drawSprite(astronautNoHelmet, astronautNoHelmetSprite)
+
+      onCatapult = Matter.SAT.collides(helmetBody, catapult)
+
+      if(onCatapult.collided && catapultOnlyOnce == true) {
+        catapultOnlyOnce = false;
+        activateCatapult()
+      }
+
       drawBodies(bridge.bodies);
       drawConstraints(bridge.constraints);
       drawBodies(blockStack.bodies);
-          
+
       break;
     default:
       break;
-  }
+    }
 }
 
 function keyPressed() {
   // is SPACE pressed?
   if (keyCode === 32 && engine.gravity.y == 0) {
     Body.setVelocity(helmet.body,
-      {x: 5.25, y: -0.5}
+      {x: 15.25, y: -0.5}
     );
     // Tell p5.js to prevent default behavior on Spacebar press (scrolling)
     return(false);
-  } else {
+    //&& helmetBody.velocity.y < 0.05 && helmetBody.velocity.y > -0.05
+  } else if (keyCode === 32 && engine.gravity.y == 1 && shootingEnemy == false ) {
     Body.applyForce(helmet.body,
       {x: helmet.body.position.x, y: helmet.body.position.y},
-      {x: 0.03, y: -0.1}
+      {x: 0.035, y: -0.15}
+    );
+  } else if (keyCode === 32 && engine.gravity.y == 1 && shootingEnemy == true ) {
+    Body.applyForce(helmet.body,
+      {x: helmet.body.position.x, y: helmet.body.position.y},
+      {x: 0.055, y: -0.25}
     );
   }
 }
@@ -323,8 +436,33 @@ function introScene() {
 
 function marsLanding() {
   engine.gravity.y = 1;
-  Composite.remove(world, blackHole)
-  Composite.add(world, blockStack);
+  Composite.remove(world, blackHole);
+  Body.translate(blackHole, {x: 0, y: 1000})
+  if(helmetBody.position.x < windowWidth*1.2) {
+    Composite.add(world, blockStack);
+    Composite.add(world, [bridge]);
+    Composite.add(world, catapultSupportLeft);
+    Composite.add(world, catapultSupportRight);
+    Composite.add(world, catapult);
+    Composite.add(world, astronautNoHelmet);
+  }
+}
+
+function projectileRelease() {
+  if (projectileNumber < projectilesCount && shootingEnemy == true) {
+    setTimeout(function() {
+      Matter.Body.setStatic(projectiles[projectileNumber], false)
+      Composite.add(world, projectiles[projectileNumber])
+      Body.setVelocity(projectiles[projectileNumber], {x: -(ufo.position.x - helmetBody.position.x)*0.04, y: -(ufo.position.y - helmetBody.position.y)*0.04})
+      projectileNumber++
+      projectileRelease()
+    }, 1300)
+  }
+}
+
+function activateCatapult() {
+  Composite.add(world, catapultActivator);
+  Body.setVelocity(catapultActivator, {x: 0, y: 100})
 }
 
 function spawnDebris(x, y) {
@@ -346,7 +484,7 @@ function spawnDebris(x, y) {
     default:
       break;
   }
-  
+
 }
 
 function scrollFollow(matterObj) {
