@@ -166,32 +166,32 @@ function setup() {
 
   // Bridge
   const group = Body.nextGroup(true);
-  const rects = Composites.stack(windowWidth*1.6, windowHeight*0.3, 15, 1, 10, 10, function(x, y) {
+  const rects = Composites.stack(windowWidth*1.6, windowHeight*0.36, 15, 1, 10, 10, function(x, y) {
       return Bodies.rectangle(x, y, windowWidth*0.03, 20, { collisionFilter: { group: group } });
   });
   bridge = Composites.chain(rects, 0.5, 0, -0.5, 0, {stiffness: 1, length: 2, render: {type: 'line'}});
 
   // left and right fix point of bridge
   Composite.add(rects, Constraint.create({
-    pointA: {x: windowWidth*1.6, y: windowHeight*0.3},
+    pointA: {x: windowWidth*1.6, y: windowHeight*0.36},
     bodyB: rects.bodies[0],
     pointB: {x: -25, y: 0},
     stiffness: 0.1
   }));
   Composite.add(rects, Constraint.create({
-    pointA: {x: windowWidth*2.3, y: windowHeight*0.7},
+    pointA: {x: windowWidth*2.3, y: windowHeight*0.75},
     bodyB: rects.bodies[rects.bodies.length-1],
     pointB: {x: +25, y: 0},
     stiffness: 0.02
   }));
 
   // Stack of blocks
-  blockStack = Composites.stack(windowWidth*2.8, windowHeight * 0.55 , 3, 20, 3, 3, function(x, y) {
+  blockStack = Composites.stack(windowWidth*2.8, windowHeight * 0.25 , 3, 40, 3, 3, function(x, y) {
     return Bodies.rectangle(x, y, 20, 20);
   });
 
   // Platforms
-  platformYCord = windowHeight * 0.74
+  platformYCord = windowHeight * 0.78
   for (let i = 0; i < platformCount; i++) {
     if (i % 2 == 0) {
       platformXCord = windowWidth * 1.25;
@@ -199,7 +199,7 @@ function setup() {
       platformXCord = windowWidth * 1.6;
     }
     platforms[i] = Bodies.rectangle(platformXCord, platformYCord, 200, 29 , {isStatic: true});
-    platformYCord -= windowHeight*0.07
+    platformYCord -= windowHeight*0.08
   }
   Composite.add(world, platforms);
 
@@ -235,11 +235,11 @@ function draw() {
   drawSprite(blackHole, blackHoleSprite);
 
   for (let i = 0; i < spaceObjects.length; i++) {
-    if (spaceObjects[i] instanceof Comet) {
+    if (spaceObjects[i] instanceof Comet && engine.gravity.y == 0) {
       // Comet
       Body.setAngle(spaceObjects[i].body, Vector.angle({x: 0, y: 0}, spaceObjects[i].body.velocity) + 1.25 * Math.PI);
       spaceObjects[i].sprite.draw(spaceObjects[i].body, spaceObjects[i].sprite.animation[0].height / 7, -spaceObjects[i].sprite.animation[0].width / 7);
-    } else if (spaceObjects[i] instanceof Satellite) {
+    } else if (spaceObjects[i] instanceof Satellite && engine.gravity.y == 0) {
       // Satellite
       drawSprite(spaceObjects[i].body, spaceObjects[i].sprite);
       //Matter.Body.rotate(spaceObjects[i].body, 0.05);
@@ -257,13 +257,13 @@ function draw() {
 
   countingUp.forEach(countingUp => {
     if(countingUp % 2 == 0 && reverseEven == false && platforms[0].position.x < windowWidth * 1.6) {
-      Body.translate(platforms[countingUp], {x: +2, y: 0})
+      Body.translate(platforms[countingUp], {x: +4, y: 0})
     } else if (countingUp % 2 == 0 && reverseEven == true && platforms[0].position.x > windowWidth * 1.25) {
-      Body.translate(platforms[countingUp], {x: -2, y: 0})
+      Body.translate(platforms[countingUp], {x: -4, y: 0})
     } else if (countingUp % 2 != 0 && reverseOdd == false && platforms[1].position.x < windowWidth * 1.6) {
-      Body.translate(platforms[countingUp], {x: +2, y: 0})
+      Body.translate(platforms[countingUp], {x: +4, y: 0})
     } else if (countingUp % 2 != 0 && reverseOdd == true && platforms[1].position.x > windowWidth * 1.25) {
-      Body.translate(platforms[countingUp], {x: -2, y: 0})
+      Body.translate(platforms[countingUp], {x: -4, y: 0})
     } else if (platforms[0].position.x == windowWidth * 1.6) {
       reverseEven = true;
     } else if (platforms[0].position.x == windowWidth * 1.25) {
@@ -277,13 +277,13 @@ function draw() {
     onPlatform = Matter.SAT.collides(helmetBody, platforms[countingUp]);
 
     if(countingUp % 2 == 0 && onPlatform.collided && reverseEven == false) {
-      Body.translate(helmetBody,{x: 2, y: 0});
+      Body.translate(helmetBody,{x: 4, y: 0});
     } else if (countingUp % 2 == 0 && onPlatform.collided && reverseEven == true) {
-      Body.translate(helmetBody,{x: -2, y: 0});
+      Body.translate(helmetBody,{x: -4, y: 0});
     } else if (countingUp % 2 != 0 && onPlatform.collided && reverseOdd == true) {
-      Body.translate(helmetBody,{x: -2, y: 0});
+      Body.translate(helmetBody,{x: -4, y: 0});
     } else if (countingUp % 2 != 0 && onPlatform.collided && reverseOdd == false) {
-      Body.translate(helmetBody,{x: +2, y: 0});
+      Body.translate(helmetBody,{x: +4, y: 0});
     }
   });
 
@@ -326,14 +326,15 @@ function keyPressed() {
   } else {
     Body.applyForce(helmet.body,
       {x: helmet.body.position.x, y: helmet.body.position.y},
-      {x: 0.03, y: -0.1}
+      {x: 0.035, y: -0.15}
     );
   }
 }
 
 function marsLanding() {
   engine.gravity.y = 1;
-  Composite.remove(world, blackHole)
+  Composite.remove(world, blackHole);
+  Body.translate(blackHole, {x: 0, y: 1000})
   if(helmetBody.position.x < windowWidth*1.2) {
     Composite.add(world, blockStack);
     Composite.add(world, [bridge]);
