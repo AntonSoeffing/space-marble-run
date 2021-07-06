@@ -313,6 +313,8 @@ function draw() {
   drawBodies(bridge.bodies);
   drawConstraints(bridge.constraints);
   drawBodies(blockStack.bodies);
+
+  console.log(helmetBody.velocity.y)
 }
 
 function keyPressed() {
@@ -323,10 +325,16 @@ function keyPressed() {
     );
     // Tell p5.js to prevent default behavior on Spacebar press (scrolling)
     return(false);
-  } else {
+    //helmetBody.velocity.y < 0.05 && helmetBody.velocity.y > -0.05 &&
+  } else if (keyCode === 32 && engine.gravity.y == 1 && shootingEnemy == false && helmetBody.velocity.y < 0.05 && helmetBody.velocity.y > -0.05) {
     Body.applyForce(helmet.body,
       {x: helmet.body.position.x, y: helmet.body.position.y},
       {x: 0.035, y: -0.15}
+    );
+  } else if (keyCode === 32 && engine.gravity.y == 1 && shootingEnemy == true ) {
+    Body.applyForce(helmet.body,
+      {x: helmet.body.position.x, y: helmet.body.position.y},
+      {x: 0.055, y: -0.25}
     );
   }
 }
