@@ -91,15 +91,21 @@ function preload() {
   // Satellite
   satelliteSprite = loadImage('sprites/satellite.png');
 
+  //Wall
+  wallSprite = loadImage('sprites/wall.png')
+
+  //Bridge
+  bridgeSprite = loadImage('sprites/bridge.png')
+
   // Ufo
   ufoSprite = loadImage('sprites/Ufo.png')
-  
+
   //Platform
   platformSprite = loadImage('sprites/plattform.png')
-  
+
   //Astronaut
   astronautNoHelmetSprite = loadImage('sprites/astronaut_no_helmet.png')
-  
+
   // Preload fonts
   pixelFont = loadFont('fonts/pixelFont.ttf');
 }
@@ -178,7 +184,7 @@ function setup() {
 
   // ----- MARS -----
   // Mars ground
-  marsGround = Bodies.rectangle(windowWidth * 1.105 , windowHeight * 0.82, windowWidth*0.21, 20, {isStatic: true})
+  marsGround = Bodies.rectangle(windowWidth * 1.11, windowHeight * 0.82, windowWidth*0.22, 20, {isStatic: true})
   Composite.add(world, marsGround);
 
   marsGround2 = Bodies.rectangle(windowWidth * 2.5 , windowHeight * 0.82, windowWidth, 20, {isStatic: true})
@@ -187,22 +193,28 @@ function setup() {
   marsGround3 = Bodies.rectangle(windowWidth * 3.5 , windowHeight * 0.82, windowWidth, 20, {isStatic: true})
   Composite.add(world, marsGround3);
 
+  groundHole = Bodies.rectangle(windowWidth * 1.28 , windowHeight * 0.91, windowWidth*0.16, 20, {isStatic: true, angle: 120})
+  Composite.add(world, groundHole);
+
+  groundHole2 = Bodies.rectangle(windowWidth * 1.53 , windowHeight * 0.91, windowWidth*0.16, 20, {isStatic: true, angle: 125})
+  Composite.add(world, groundHole2);
+
   // Bridge
   const group = Body.nextGroup(true);
-  const rects = Composites.stack(windowWidth*1.6, windowHeight*0.36, 15, 1, 10, 10, function(x, y) {
+  const rects = Composites.stack(windowWidth*1.63, windowHeight*0.42, 15, 1, 10, 10, function(x, y) {
       return Bodies.rectangle(x, y, windowWidth*0.03, 20, { collisionFilter: { group: group } });
   });
   bridge = Composites.chain(rects, 0.5, 0, -0.5, 0, {stiffness: 1, length: 2, render: {type: 'line'}});
 
   // left and right fix point of bridge
   Composite.add(rects, Constraint.create({
-    pointA: {x: windowWidth*1.6, y: windowHeight*0.37},
+    pointA: {x: windowWidth*1.63, y: windowHeight*0.42},
     bodyB: rects.bodies[0],
     pointB: {x: -25, y: 0},
     stiffness: 0.1
   }));
   Composite.add(rects, Constraint.create({
-    pointA: {x: windowWidth*2.3, y: windowHeight*0.75},
+    pointA: {x: windowWidth*2.31, y: windowHeight*0.75},
     bodyB: rects.bodies[rects.bodies.length-1],
     pointB: {x: +25, y: 0},
     stiffness: 0.02
@@ -214,7 +226,7 @@ function setup() {
     if (i % 2 == 0) {
       platformXCord = windowWidth * 1.25;
     } else {
-      platformXCord = windowWidth * 1.6;
+      platformXCord = windowWidth * 1.55;
     }
     platforms[i] = Bodies.rectangle(platformXCord, platformYCord, 200, 29 , {isStatic: true});
     platformYCord -= windowHeight*0.08
@@ -222,7 +234,7 @@ function setup() {
   Composite.add(world, platforms);
 
   //Wall
-  obstacleWall = Bodies.rectangle(windowWidth*1.6, windowHeight * 0.59,  20, windowWidth*0.22, {isStatic: true})
+  obstacleWall = Bodies.rectangle(windowWidth*1.61, windowHeight * 0.611,  113, 533, {isStatic: true})
   Composite.add(world, obstacleWall);
 
   //UFO
@@ -230,7 +242,7 @@ function setup() {
   Composite.add(world, ufo);
 
   for (let i = 0; i < projectilesCount; i++) {
-    projectiles[i] = Bodies.circle(windowWidth * 2.5, 200, 7, {isStatic: true, mass: 4})
+    projectiles[i] = Bodies.rectangle(windowWidth * 2.5, 200, 9,9, {isStatic: true, mass: 4})
   }
 
   // Stack of blocks
@@ -269,11 +281,11 @@ function draw() {
       drawSprite(blackHole, blackHoleSprite);
 
       for (let i = 0; i < spaceObjects.length; i++) {
-        if (spaceObjects[i] instanceof Comet) {
+        if (spaceObjects[i] instanceof Comet && engine.gravity.y == 0) {
           // Comet
           Body.setAngle(spaceObjects[i].body, Vector.angle({x: 0, y: 0}, spaceObjects[i].body.velocity) + 1.25 * Math.PI);
           spaceObjects[i].sprite.drawAnimation(spaceObjects[i].body, spaceObjects[i].sprite.animation[0].height / 7, -spaceObjects[i].sprite.animation[0].width / 7);
-        } else if (spaceObjects[i] instanceof Satellite) {
+        } else if (spaceObjects[i] instanceof Satellite && engine.gravity.y == 0) {
           // Satellite
           drawSprite(spaceObjects[i].body, spaceObjects[i].sprite);
           //Matter.Body.rotate(spaceObjects[i].body, 0.05);
@@ -289,19 +301,19 @@ function draw() {
       let countingUp = [0,1,2,3,4]
 
       countingUp.forEach(countingUp => {
-        if(countingUp % 2 == 0 && reverseEven == false && platforms[0].position.x < windowWidth * 1.6) {
+        if(countingUp % 2 == 0 && reverseEven == false && platforms[0].position.x < windowWidth * 1.55) {
           Body.translate(platforms[countingUp], {x: +4, y: 0})
         } else if (countingUp % 2 == 0 && reverseEven == true && platforms[0].position.x > windowWidth * 1.25) {
           Body.translate(platforms[countingUp], {x: -4, y: 0})
-        } else if (countingUp % 2 != 0 && reverseOdd == false && platforms[1].position.x < windowWidth * 1.6) {
+        } else if (countingUp % 2 != 0 && reverseOdd == false && platforms[1].position.x < windowWidth * 1.55) {
           Body.translate(platforms[countingUp], {x: +4, y: 0})
         } else if (countingUp % 2 != 0 && reverseOdd == true && platforms[1].position.x > windowWidth * 1.25) {
           Body.translate(platforms[countingUp], {x: -4, y: 0})
-        } else if (platforms[0].position.x == windowWidth * 1.6) {
+        } else if (platforms[0].position.x == windowWidth * 1.55) {
           reverseEven = true;
         } else if (platforms[0].position.x == windowWidth * 1.25) {
           reverseEven = false;
-        } else if (platforms[1].position.x == windowWidth * 1.6) {
+        } else if (platforms[1].position.x == windowWidth * 1.55) {
           reverseOdd = true;
         } else if (platforms[1].position.x == windowWidth * 1.25) {
           reverseOdd = false;
@@ -329,7 +341,6 @@ function draw() {
       drawBodies(projectiles)
       drawSprite(ufo, ufoSprite)
 
-
       if(helmetBody.position.x > windowWidth * 2 && helmetBody.position.x < windowWidth * 3 && shootingEnemy == false) {
         shootingEnemy = true;
         projectileRelease();
@@ -341,7 +352,7 @@ function draw() {
 
       fill(40);
 
-      drawBody(obstacleWall)
+      drawSprite(obstacleWall, wallSprite)
       drawBody(catapultSupportLeft)
       drawBody(catapultSupportRight)
       drawBody(catapult)
@@ -358,6 +369,10 @@ function draw() {
 
       drawBodies(bridge.bodies);
       drawConstraints(bridge.constraints);
+
+      for (let i = 0; i < 15; i++) {
+        drawSprite(bridge.bodies[i], bridgeSprite);
+      }
       drawBodies(blockStack.bodies);
 
       break;
@@ -398,9 +413,9 @@ function introScene() {
   const angle =  QUARTER_PI;
 
   push();
-  background(10);  
-  
-  
+  background(10);
+
+
   if (ms < 1000) {
     rocket.drawFrame(0, x, y, angle);
   } else if (ms < 1100) {
@@ -414,7 +429,7 @@ function introScene() {
   } else if (ms < 3500) {
     rocket.drawFrame(5, x, y, angle);
 
-  
+
     push();
     translate(helmetX, helmetY);
     rotate(0.0005 * ms);
