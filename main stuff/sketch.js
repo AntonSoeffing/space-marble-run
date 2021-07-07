@@ -66,47 +66,49 @@ let catapultOnlyOnce = true;
 function preload() {
   // Preload images
   // Rocket
-  rocketSpriteData = loadJSON('sprites/rocket_data.json');
-  rocketSpriteSheet = loadImage('sprites/rocket_sheet.png');
+  rocketSpriteData = loadJSON('sprites/space/rocket/rocket_data.json');
+  rocketSpriteSheet = loadImage('sprites/space/rocket/rocket_sheet.png');
 
   // Mars Background
-  marsSprite = loadImage('sprites/backgrounds/mars/mars3.png');
+  marsSprite = loadImage('sprites/backgrounds/mars/mars.png');
 
   // Space Background Elements
-  planetSprite = loadImage('sprites/backgrounds/space/mars_in_space.png');
+  planetSprite = loadImage('sprites/backgrounds/space/planet.png');
   moonSprite = loadImage('sprites/backgrounds/space/moon.png');
-  star0Sprite = loadImage('sprites/backgrounds/space/star_0.png');
-  star1Sprite = loadImage('sprites/backgrounds/space/star_1.png');
-  star2Sprite = loadImage('sprites/backgrounds/space/star_2.png');
+  star0Sprite = loadImage('sprites/backgrounds/space/stars/star_0.png');
+  star1Sprite = loadImage('sprites/backgrounds/space/stars/star_1.png');
+  star2Sprite = loadImage('sprites/backgrounds/space/stars/star_2.png');
 
   // Black Hole
-  blackHoleSprite = loadImage('sprites/blackHole.png');
+  blackHoleSprite = loadImage('sprites/space/blackHole.png');
 
   // Helmet
   helmetSprite = loadImage('sprites/helmet.png');
 
   // Comets
-  cometSpriteData = loadJSON('sprites/comet_data.json');
-  cometSpriteSheet = loadImage('sprites/comet_sheet.png');
+  cometSpriteData = loadJSON('sprites/space/comet/comet_data.json');
+  cometSpriteSheet = loadImage('sprites/space/comet/comet_sheet.png');
   // Satellite
-  satelliteSprite = loadImage('sprites/satellite.png');
+  satelliteSprite = loadImage('sprites/space/satellite.png');
 
   //Wall
-  wallSprite = loadImage('sprites/wall.png')
+  wallSprite = loadImage('sprites/mars/wall.png')
 
   //Bridge
-  bridgeSprite = loadImage('sprites/bridge.png')
+  bridgeSprite = loadImage('sprites/mars/bridge.png')
 
   // Ufo
-  ufoSprite = loadImage('sprites/Ufo.png')
+  ufoSprite = loadImage('sprites/mars/ufo.png')
 
   //Platform
-  platformSprite = loadImage('sprites/plattform.png')
+  platformSprite = loadImage('sprites/mars/platform.png')
 
   //Stone
-  stoneSprite = loadImage('sprites/stone.png')
+  stoneSprite = loadImage('sprites/mars/stone.png')
+
   //Astronaut
-  astronautNoHelmetSprite = loadImage('sprites/astronaut_no_helmet.png')
+  astronautHelmetSprite = loadImage('sprites/mars/astronaut/astronaut_helmet.png')
+  astronautNoHelmetSprite = loadImage('sprites/mars/astronaut/astronaut_no_helmet.png')
 
   // Preload fonts
   pixelFont = loadFont('fonts/pixelFont.ttf');
