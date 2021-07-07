@@ -434,6 +434,14 @@ function introScene() {
   pop();
 }
 
+function gameOver() {
+  Composite.clear(world);
+  Engine.clear(engine);
+  Runner.stop(runner);
+  spaceObjects = [];
+  setup();
+}
+
 function marsLanding() {
   engine.gravity.y = 1;
   Composite.remove(world, blackHole);
@@ -484,7 +492,6 @@ function spawnDebris(x, y) {
     default:
       break;
   }
-
 }
 
 function scrollFollow(matterObj) {
