@@ -103,6 +103,8 @@ function preload() {
   //Platform
   platformSprite = loadImage('sprites/plattform.png')
 
+  //Stone
+  stoneSprite = loadImage('sprites/stone.png')
   //Astronaut
   astronautNoHelmetSprite = loadImage('sprites/astronaut_no_helmet.png')
 
@@ -144,7 +146,7 @@ function setup() {
   Composite.add(world, blackHole);
 
   // Helmet
-  helmetBody = Bodies.circle(windowWidth * 0.1, windowHeight * 0.7, helmetSprite.height / 2, {mass: 4});
+  helmetBody = Bodies.circle(0, windowHeight * 0.7, helmetSprite.height / 2, {mass: 4});
   Composite.add(world, helmetBody);
   helmet = new Helmet(helmetBody, helmetSprite);
   spaceObjects.push(helmet);
@@ -246,12 +248,21 @@ function setup() {
   }
 
   // Stack of blocks
-  blockStack = Composites.stack(windowWidth*2.8, 0 , 3, 80, 3, 3, function(x, y) {
-    return Bodies.rectangle(x, y, 20, 20);
+  blockStack = Composites.stack(windowWidth*2.6, 0 , 3, 20, 3, 3, function(x, y) {
+    return Bodies.rectangle(x, y, 29, 29);
   });
 
+  // PlatformUpDown
+  platformUpDown = Bodies.rectangle(windowWidth*2.8, windowHeight*0.8, 200, 29 , {isStatic: true});
+  Composite.add(world, platformUpDown);
+
+  //downSlide
+  downSlide = Bodies.rectangle(windowWidth * 3.06 , windowHeight * 0.4, windowWidth*0.45, 20, {isStatic: true})
+  Composite.add(world, downSlide);
+  Matter.Body.rotate(downSlide, 60)
+
   // Catapult
-  catapultSupportLeft = Bodies.rectangle(windowWidth*3.31 , windowHeight * 0.7, 80, 120)
+  catapultSupportLeft = Bodies.rectangle(windowWidth*3.38 , windowHeight * 0.7, 80, 120)
   catapultSupportRight = Bodies.rectangle(windowWidth*3.42, windowHeight * 0.7, 80, 120)
   catapult = Bodies.rectangle(windowWidth*3.4, windowHeight * 0.65, 600, 20)
   catapultActivator = Bodies.circle(windowWidth*3.5, -300, 100);
@@ -302,11 +313,11 @@ function draw() {
 
       countingUp.forEach(countingUp => {
         if(countingUp % 2 == 0 && reverseEven == false && platforms[0].position.x < windowWidth * 1.55) {
-          Body.translate(platforms[countingUp], {x: +4, y: 0})
+          Body.translate(platforms[countingUp], {x: 4, y: 0})
         } else if (countingUp % 2 == 0 && reverseEven == true && platforms[0].position.x > windowWidth * 1.25) {
           Body.translate(platforms[countingUp], {x: -4, y: 0})
         } else if (countingUp % 2 != 0 && reverseOdd == false && platforms[1].position.x < windowWidth * 1.55) {
-          Body.translate(platforms[countingUp], {x: +4, y: 0})
+          Body.translate(platforms[countingUp], {x: 4, y: 0})
         } else if (countingUp % 2 != 0 && reverseOdd == true && platforms[1].position.x > windowWidth * 1.25) {
           Body.translate(platforms[countingUp], {x: -4, y: 0})
         } else if (platforms[0].position.x == windowWidth * 1.55) {
@@ -328,13 +339,31 @@ function draw() {
         } else if (countingUp % 2 != 0 && onPlatform.collided && reverseOdd == true) {
           Body.translate(helmetBody,{x: -4, y: 0});
         } else if (countingUp % 2 != 0 && onPlatform.collided && reverseOdd == false) {
-          Body.translate(helmetBody,{x: +4, y: 0});
+          Body.translate(helmetBody,{x: 4, y: 0});
         }
       });
 
       for (let i = 0; i < platformCount; i++) {
         drawSprite(platforms[i], platformSprite);
       }
+
+      if(reverse == false && platformUpDown.position.y < windowHeight*0.8) {
+        Body.translate(platformUpDown, {x: 0, y: 4})
+      } else if (reverse == true && platformUpDown.position.y > windowHeight*0.3) {
+        Body.translate(platformUpDown, {x: 0, y: -4})
+      } else if (platformUpDown.position.y == windowHeight*0.8) {
+        reverse = true;
+      } else if (platformUpDown.position.y < windowHeight*0.31) {
+        reverse = false;
+      }
+
+      onPlatformUpDown = Matter.SAT.collides(helmetBody, platformUpDown);
+
+      if(onPlatformUpDown.collided && reverse == false) {
+        Body.translate(helmetBody, {x: 0, y: 4})
+      }
+
+      drawSprite(platformUpDown, platformSprite)
 
       // UFO Logic
       fill('red')
@@ -350,6 +379,10 @@ function draw() {
         shootingEnemy = false;
       }
 
+      noStroke()
+      fill('Sienna')
+      drawBody(downSlide)
+
       fill(40);
 
       drawSprite(obstacleWall, wallSprite)
@@ -357,8 +390,6 @@ function draw() {
       drawBody(catapultSupportRight)
       drawBody(catapult)
       drawBody(catapultActivator)
-
-      drawSprite(astronautNoHelmet, astronautNoHelmetSprite)
 
       onCatapult = Matter.SAT.collides(helmetBody, catapult)
 
@@ -373,8 +404,23 @@ function draw() {
       for (let i = 0; i < 15; i++) {
         drawSprite(bridge.bodies[i], bridgeSprite);
       }
-      drawBodies(blockStack.bodies);
 
+      for (let i = 0; i < 60; i++) {
+        drawSprite(blockStack.bodies[i], stoneSprite);
+      }
+
+      drawSprite(astronautNoHelmet, astronautNoHelmetSprite)
+
+      hitAstronaut = Matter.SAT.collides(helmetBody, astronautNoHelmet)
+
+      if(hitAstronaut.collided) {
+        scene = 'gg'
+      }
+
+      break;
+
+    case 'gg':
+      ggWP()
       break;
     default:
       break;
@@ -407,8 +453,8 @@ function introScene() {
   let ms = millis();
   let x = millis() * 0.4 + windowWidth * 0.175;
   let y = - millis() * 0.4 + windowHeight * 1.2;
-  let helmetX = windowWidth / 2 + ms * 0.3 - 420;
-  let helmetY = windowHeight / 2 + ms * 0.1 - 140;
+  let helmetX = windowWidth / 2 + ms * 0.3 - 540;
+  let helmetY = windowHeight / 2 + ms * 0.2 - 1;
 
   const angle =  QUARTER_PI;
 
@@ -449,6 +495,17 @@ function introScene() {
   pop();
 }
 
+function ggWP() {
+  push();
+  background(10);
+  textFont(pixelFont);
+  fill(256);
+  textSize(72);
+  textAlign(CENTER, CENTER);
+  text('gg wp', windowWidth*3.5, windowHeight*0.5);
+  pop();
+}
+
 function marsLanding() {
   engine.gravity.y = 1;
   Composite.remove(world, blackHole);
@@ -468,7 +525,7 @@ function projectileRelease() {
     setTimeout(function() {
       Matter.Body.setStatic(projectiles[projectileNumber], false)
       Composite.add(world, projectiles[projectileNumber])
-      Body.setVelocity(projectiles[projectileNumber], {x: -(ufo.position.x - helmetBody.position.x)*0.04, y: -(ufo.position.y - helmetBody.position.y)*0.04})
+      Body.setVelocity(projectiles[projectileNumber], {x: -(ufo.position.x - helmetBody.position.x)*0.03, y: -(ufo.position.y - helmetBody.position.y)*0.03})
       projectileNumber++
       projectileRelease()
     }, 1300)
