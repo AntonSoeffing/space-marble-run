@@ -30,6 +30,7 @@ let spaceObjects = [];
 
 let helmet;
 let helmetSprite;
+let helmetOnGround;
 
 let cometSpriteData;
 let cometSpriteSheet;
@@ -153,7 +154,8 @@ function setup() {
   Composite.add(world, blackHole);
 
   // Helmet
-  helmetBody = Bodies.circle(0, windowHeight * 0.7, helmetSprite.height / 2, {mass: 4});
+  //helmetBody = Bodies.circle(0, windowHeight * 0.7, helmetSprite.height / 2, {mass: 4});
+  helmetBody = Bodies.circle(3000, windowHeight * 0.7, helmetSprite.height / 2, {mass: 4});
   Composite.add(world, helmetBody);
   helmet = new Helmet(helmetBody, helmetSprite);
   spaceObjects.push(helmet);
@@ -187,6 +189,14 @@ function setup() {
             break;
           }
         }
+      }
+    });
+  });
+
+  Events.on(engine, 'collisionStart', function(event) {
+    event.pairs.forEach(({ bodyA, bodyB }) => {
+      if (bodyA == helmetBody || bodyB == helmetBody) {
+        helmetOnGround = true;
       }
     });
   });
@@ -289,7 +299,6 @@ function setup() {
 
 function draw() {
   frameRate(60);
-
   switch (scene) {
     case 'intro':
       introScene();
@@ -456,11 +465,12 @@ function keyPressed() {
     // Tell p5.js to prevent default behavior on Spacebar press (scrolling)
     return(false);
     //&& helmetBody.velocity.y < 0.05 && helmetBody.velocity.y > -0.05
-  } else if (keyCode === 32 && engine.gravity.y == 1) {
+  } else if (keyCode === 32 && engine.gravity.y == 1 && helmetOnGround == true) {
     Body.applyForce(helmet.body,
       {x: helmet.body.position.x, y: helmet.body.position.y},
       {x: 0.035, y: -0.15}
     );
+    helmetOnGround = false;
   }
 }
 
@@ -536,7 +546,7 @@ function marsLanding() {
   Body.translate(blackHole, {x: 0, y: 1000})
   if(helmetBody.position.x < windowWidth*1.2) {
     Composite.add(world, blockStack);
-    Composite.add(world, [bridge]);
+    //Composite.add(world, [bridge]);
     Composite.add(world, catapultSupportLeft);
     Composite.add(world, catapultSupportRight);
     Composite.add(world, catapult);
