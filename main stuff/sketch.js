@@ -106,9 +106,14 @@ function preload() {
   //Stone
   stoneSprite = loadImage('sprites/mars/stone.png')
 
+  //Catapult
+  catapultSupportSprite = loadImage('sprites/mars/catapult_support.png')
+  stoneBallSprite = loadImage('sprites/mars/stone_ball.png')
+
   //Astronaut
   astronautHelmetSprite = loadImage('sprites/mars/astronaut/astronaut_helmet.png')
   astronautNoHelmetSprite = loadImage('sprites/mars/astronaut/astronaut_no_helmet.png')
+  rocketLegsSprite = loadImage('sprites/mars/rocket_legs.png')
 
   // Preload fonts
   pixelFont = loadFont('fonts/pixelFont.ttf');
@@ -233,7 +238,7 @@ function setup() {
       platformXCord = windowWidth * 1.55;
     }
     platforms[i] = Bodies.rectangle(platformXCord, platformYCord, 200, 29 , {isStatic: true});
-    platformYCord -= windowHeight*0.08
+    platformYCord -= windowHeight*0.09
   }
   Composite.add(world, platforms);
 
@@ -250,13 +255,21 @@ function setup() {
   }
 
   // Stack of blocks
-  blockStack = Composites.stack(windowWidth*2.6, 0 , 3, 20, 3, 3, function(x, y) {
+  blockStack = Composites.stack(windowWidth*2.4, 0 , 3, 10, 3, 3, function(x, y) {
     return Bodies.rectangle(x, y, 29, 29);
   });
 
   // PlatformUpDown
   platformUpDown = Bodies.rectangle(windowWidth*2.8, windowHeight*0.8, 200, 29 , {isStatic: true});
   Composite.add(world, platformUpDown);
+
+  //PlatformStatic
+  platformStatic1 = Bodies.rectangle(windowWidth*2.2, windowHeight*0.6, 200, 29 , {isStatic: true});
+  Composite.add(world, platformStatic1);
+  platformStatic2 = Bodies.rectangle(windowWidth*2.4, windowHeight*0.5, 200, 29 , {isStatic: true});
+  Composite.add(world, platformStatic2);
+  platformStatic3 = Bodies.rectangle(windowWidth*2.6, windowHeight*0.4, 200, 29 , {isStatic: true});
+  Composite.add(world, platformStatic3);
 
   //downSlide
   downSlide = Bodies.rectangle(windowWidth * 3.06 , windowHeight * 0.4, windowWidth*0.45, 20, {isStatic: true})
@@ -267,10 +280,11 @@ function setup() {
   catapultSupportLeft = Bodies.rectangle(windowWidth*3.38 , windowHeight * 0.7, 80, 120)
   catapultSupportRight = Bodies.rectangle(windowWidth*3.42, windowHeight * 0.7, 80, 120)
   catapult = Bodies.rectangle(windowWidth*3.4, windowHeight * 0.65, 600, 20)
-  catapultActivator = Bodies.circle(windowWidth*3.5, -300, 100);
+  catapultActivator = Bodies.circle(windowWidth*3.5, -300, 50);
 
   //Astronaut
-  astronautNoHelmet = Bodies.rectangle(windowWidth*3.8 , windowHeight * 0.71, 80, 180)
+  astronautNoHelmet = Bodies.rectangle(windowWidth*3.8 , windowHeight * 0.715, 80, 180)
+  rocketLegs = Bodies.rectangle(windowWidth*3.9 , windowHeight * 0.645, 80, 180)
 }
 
 function draw() {
@@ -366,6 +380,9 @@ function draw() {
       }
 
       drawSprite(platformUpDown, platformSprite)
+      drawSprite(platformStatic1, platformSprite)
+      drawSprite(platformStatic2, platformSprite)
+      drawSprite(platformStatic3, platformSprite)
 
       // UFO Logic
       fill('red')
@@ -384,14 +401,14 @@ function draw() {
       noStroke()
       fill('Sienna')
       drawBody(downSlide)
+      drawBody(catapult)
 
       fill(40);
 
       drawSprite(obstacleWall, wallSprite)
-      drawBody(catapultSupportLeft)
-      drawBody(catapultSupportRight)
-      drawBody(catapult)
-      drawBody(catapultActivator)
+      drawSprite(catapultSupportLeft, catapultSupportSprite)
+      drawSprite(catapultSupportRight, catapultSupportSprite)
+      drawSprite(catapultActivator, stoneBallSprite)
 
       onCatapult = Matter.SAT.collides(helmetBody, catapult)
 
@@ -407,11 +424,12 @@ function draw() {
         drawSprite(bridge.bodies[i], bridgeSprite);
       }
 
-      for (let i = 0; i < 60; i++) {
+      for (let i = 0; i < 30; i++) {
         drawSprite(blockStack.bodies[i], stoneSprite);
       }
 
       drawSprite(astronautNoHelmet, astronautNoHelmetSprite)
+      drawSprite(rocketLegs, rocketLegsSprite)
 
       hitAstronaut = Matter.SAT.collides(helmetBody, astronautNoHelmet)
 
@@ -438,15 +456,10 @@ function keyPressed() {
     // Tell p5.js to prevent default behavior on Spacebar press (scrolling)
     return(false);
     //&& helmetBody.velocity.y < 0.05 && helmetBody.velocity.y > -0.05
-  } else if (keyCode === 32 && engine.gravity.y == 1 && shootingEnemy == false ) {
+  } else if (keyCode === 32 && engine.gravity.y == 1) {
     Body.applyForce(helmet.body,
       {x: helmet.body.position.x, y: helmet.body.position.y},
       {x: 0.035, y: -0.15}
-    );
-  } else if (keyCode === 32 && engine.gravity.y == 1 && shootingEnemy == true ) {
-    Body.applyForce(helmet.body,
-      {x: helmet.body.position.x, y: helmet.body.position.y},
-      {x: 0.055, y: -0.25}
     );
   }
 }
@@ -504,6 +517,7 @@ function gameOver() {
   spaceObjects = [];
   setup();
 }
+
 function ggWP() {
   push();
   background(10);
@@ -511,7 +525,8 @@ function ggWP() {
   fill(256);
   textSize(72);
   textAlign(CENTER, CENTER);
-  text('gg wp', windowWidth*3.5, windowHeight*0.5);
+  image(astronautHelmetSprite, windowWidth*3.59, windowHeight*0.4);
+  text('First Level Completed', windowWidth*3.46, windowHeight*0.5);
   pop();
 }
 
@@ -534,16 +549,16 @@ function projectileRelease() {
     setTimeout(function() {
       Matter.Body.setStatic(projectiles[projectileNumber], false)
       Composite.add(world, projectiles[projectileNumber])
-      Body.setVelocity(projectiles[projectileNumber], {x: -(ufo.position.x - helmetBody.position.x)*0.03, y: -(ufo.position.y - helmetBody.position.y)*0.03})
+      Body.setVelocity(projectiles[projectileNumber], {x: -(ufo.position.x - helmetBody.position.x)*0.04, y: -(ufo.position.y - helmetBody.position.y)*0.04})
       projectileNumber++
       projectileRelease()
-    }, 1300)
+    }, 1700)
   }
 }
 
 function activateCatapult() {
   Composite.add(world, catapultActivator);
-  Body.setVelocity(catapultActivator, {x: 0, y: 100})
+  Body.setVelocity(catapultActivator, {x: 0, y: 80})
 }
 
 function spawnDebris(x, y) {
