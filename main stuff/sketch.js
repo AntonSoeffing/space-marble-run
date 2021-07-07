@@ -455,8 +455,8 @@ function introScene() {
   let ms = millis();
   let x = millis() * 0.4 + windowWidth * 0.175;
   let y = - millis() * 0.4 + windowHeight * 1.2;
-  let helmetX = windowWidth / 2 + ms * 0.3 - 540;
-  let helmetY = windowHeight / 2 + ms * 0.2 - 1;
+  let helmetX = windowWidth / 2 + ms * 0.3 - windowWidth * 0.2;
+  let helmetY = windowHeight / 2 + ms * 0.1 - windowHeight * 0.15;
 
   const angle =  QUARTER_PI;
 
