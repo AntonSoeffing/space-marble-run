@@ -155,7 +155,7 @@ function setup() {
 
   // Helmet
   //helmetBody = Bodies.circle(0, windowHeight * 0.7, helmetSprite.height / 2, {mass: 4});
-  helmetBody = Bodies.circle(3000, windowHeight * 0.7, helmetSprite.height / 2, {mass: 4});
+  helmetBody = Bodies.circle(0, windowHeight * 0.7, helmetSprite.height / 2, {mass: 4});
   Composite.add(world, helmetBody);
   helmet = new Helmet(helmetBody, helmetSprite);
   spaceObjects.push(helmet);
@@ -171,6 +171,7 @@ function setup() {
     Composite.add(world, body);
   }
 
+  // Black Hole Collision Event
   Events.on(engine, 'collisionStart', function(event) {
     event.pairs.forEach(({ bodyA, bodyB }) => {
       let objectToRemove;
@@ -181,7 +182,7 @@ function setup() {
       }
       if (objectToRemove) {
         Matter.World.remove(world, objectToRemove);
-
+        
         for (let i = 0; i < spaceObjects.length; i++) {
           if (spaceObjects[i].body == objectToRemove) {
             spaceObjects.splice(i, 1);
@@ -192,7 +193,22 @@ function setup() {
       }
     });
   });
+  
+  // Helmet Collision Game Over Event
+  Events.on(engine, 'collisionStart', function(event) {
+    event.pairs.forEach(({ bodyA, bodyB }) => {
+      if (bodyA == helmetBody && projectiles.includes(bodyB)) {
+        gameOver();
+      } else 
+        for (let i = 0; i < spaceObjects.length; i++) {
+          if (bodyA == helmetBody && bodyB == spaceObjects[i].body) {
+            gameOver();
+          }
+      }
+    });
+  });
 
+  // Helmet Collision Jump Event
   Events.on(engine, 'collisionStart', function(event) {
     event.pairs.forEach(({ bodyA, bodyB }) => {
       if (bodyA == helmetBody || bodyB == helmetBody) {
@@ -299,6 +315,7 @@ function setup() {
 
 function draw() {
   frameRate(60);
+
   switch (scene) {
     case 'intro':
       introScene();
@@ -454,20 +471,25 @@ function draw() {
     default:
       break;
     }
+
+  if (helmetBody.position.y > height || helmetBody.position.y < 0 ) {
+    gameOver();
+  }
 }
 
 function keyPressed() {
   // is SPACE pressed?
   if (keyCode === 32 && engine.gravity.y == 0) {
-    Body.setVelocity(helmet.body,
+    Body.setVelocity(helmetBody,
       {x: 15.25, y: -0.5}
     );
     // Tell p5.js to prevent default behavior on Spacebar press (scrolling)
     return(false);
     //&& helmetBody.velocity.y < 0.05 && helmetBody.velocity.y > -0.05
-  } else if (keyCode === 32 && engine.gravity.y == 1 && helmetOnGround == true) {
-    Body.applyForce(helmet.body,
-      {x: helmet.body.position.x, y: helmet.body.position.y},
+  //} else if (keyCode === 32 && engine.gravity.y == 1 && helmetOnGround == true) {
+  } else if (keyCode === 32 && engine.gravity.y == 1) {
+    Body.applyForce(helmetBody,
+      {x: helmetBody.position.x, y: helmetBody.position.y},
       {x: 0.035, y: -0.15}
     );
     helmetOnGround = false;
@@ -521,10 +543,13 @@ function introScene() {
 }
 
 function gameOver() {
+  shootingEnemy = false;
   Composite.clear(world);
   Engine.clear(engine);
   Runner.stop(runner);
   spaceObjects = [];
+  projectiles = [];
+  platforms = [];
   setup();
 }
 
@@ -546,7 +571,7 @@ function marsLanding() {
   Body.translate(blackHole, {x: 0, y: 1000})
   if(helmetBody.position.x < windowWidth*1.2) {
     Composite.add(world, blockStack);
-    //Composite.add(world, [bridge]);
+    Composite.add(world, [bridge]);
     Composite.add(world, catapultSupportLeft);
     Composite.add(world, catapultSupportRight);
     Composite.add(world, catapult);
