@@ -179,7 +179,7 @@ function setup() {
       }
       if (objectToRemove) {
         Composite.remove(world, objectToRemove);
-        
+
         for (let i = 0; i < spaceObjects.length; i++) {
           if (spaceObjects[i].body == objectToRemove) {
             spaceObjects.splice(i, 1);
@@ -190,9 +190,9 @@ function setup() {
       }
     });
   });
-  
+
   // Projectile Collision Remove Event
-  Events.on(engine, 'collisionStart', function(event) {
+  Events.on(engine, 'collisionActive', function(event) {
     event.pairs.forEach(({ bodyA, bodyB }) => {
       let objectToRemove;
       if (projectiles.includes(bodyA)) {
@@ -210,13 +210,13 @@ function setup() {
       }
     });
   });
-  
+
   // Helmet Collision Game Over Event
   Events.on(engine, 'collisionStart', function(event) {
     event.pairs.forEach(({ bodyA, bodyB }) => {
       if (bodyA == helmetBody && projectiles.includes(bodyB)) {
         gameOver();
-      } else 
+      } else
         for (let i = 0; i < spaceObjects.length; i++) {
           if (bodyA == helmetBody && bodyB == spaceObjects[i].body) {
             gameOver();
@@ -290,11 +290,11 @@ function setup() {
   Composite.add(world, obstacleWall);
 
   //UFO
-  ufo = Bodies.circle(windowWidth*2.5, windowHeight*0.15, 50, {isStatic: true});
+  ufo = Bodies.circle(windowWidth*2.5, windowHeight*0.15, 1, {isStatic: true});
   Composite.add(world, ufo);
 
   // Stack of blocks
-  blockStack = Composites.stack(windowWidth*2.4, 0 , 3, 10, 3, 3, function(x, y) {
+  blockStack = Composites.stack(windowWidth*2.2, 0 , 3, 10, 3, 3, function(x, y) {
     return Bodies.rectangle(x, y, 29, 29);
   });
 
@@ -305,7 +305,7 @@ function setup() {
   //PlatformStatic
   platformStatic1 = Bodies.rectangle(windowWidth*2.2, windowHeight*0.6, 200, 29 , {isStatic: true});
   Composite.add(world, platformStatic1);
-  platformStatic2 = Bodies.rectangle(windowWidth*2.4, windowHeight*0.5, 200, 29 , {isStatic: true});
+  platformStatic2 = Bodies.rectangle(windowWidth*2.45, windowHeight*0.5, 200, 29 , {isStatic: true});
   Composite.add(world, platformStatic2);
   platformStatic3 = Bodies.rectangle(windowWidth*2.6, windowHeight*0.4, 200, 29 , {isStatic: true});
   Composite.add(world, platformStatic3);
@@ -433,7 +433,7 @@ function draw() {
           projectileRelease();
         }
       }
-      
+
       if (projectiles.length > 0) {
         fill('red');
         drawBodies(projectiles)
@@ -483,7 +483,7 @@ function draw() {
       }
 
       break;
-      
+
     case 'gameover':
       setTimeout(function() {scene = 'main';}, 2000);
       push();
@@ -495,7 +495,7 @@ function draw() {
       text('TRY AGAIN', windowWidth * 0.5 + window.pageXOffset, windowHeight * 0.5);
       pop();
       break;
-  
+
     case 'gg':
       ggWP()
       break;
@@ -540,8 +540,8 @@ function introScene() {
   let ms = millis();
   let x = millis() * 0.4 + windowWidth * 0.175;
   let y = - millis() * 0.4 + windowHeight * 1.2;
-  let helmetX = windowWidth / 2 + ms * 0.3 - windowWidth * 0.2;
-  let helmetY = windowHeight / 2 + ms * 0.1 - windowHeight * 0.15;
+  let helmetX = windowWidth / 2 + ms * 0.3 - windowWidth * 0.22;
+  let helmetY = windowHeight / 2 + ms * 0.2 - windowHeight * 0.01;
 
   const angle =  QUARTER_PI;
 
@@ -603,8 +603,8 @@ function ggWP() {
   fill(256);
   textSize(72);
   textAlign(CENTER, CENTER);
-  image(astronautHelmetSprite, windowWidth*3.59, windowHeight*0.4);
-  text('First Level Completed', windowWidth*3.46, windowHeight*0.5);
+  image(astronautHelmetSprite, windowWidth*0.56 + window.pageXOffset, windowHeight*0.4);
+  text('WELL DONE', windowWidth*0.47 + window.pageXOffset, windowHeight*0.5);
   pop();
 }
 
@@ -627,7 +627,7 @@ function projectileRelease() {
     let newProjectile = Bodies.rectangle(windowWidth * 2.5, 200, 20, 20);
     projectiles.push(newProjectile);
     Composite.add(world, newProjectile);
-    Body.setVelocity(newProjectile, {x: -(ufo.position.x - helmetBody.position.x)*0.02, y: -(ufo.position.y - helmetBody.position.y)*0.02});
+    Body.setVelocity(newProjectile, {x: -(ufo.position.x - helmetBody.position.x)*0.025, y: -(ufo.position.y - helmetBody.position.y)*0.025});
   }
 }
 
