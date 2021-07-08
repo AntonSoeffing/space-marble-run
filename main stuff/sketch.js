@@ -178,7 +178,7 @@ function setup() {
         objectToRemove = bodyB;
       }
       if (objectToRemove) {
-        Matter.World.remove(world, objectToRemove);
+        Composite.remove(world, objectToRemove);
         
         for (let i = 0; i < spaceObjects.length; i++) {
           if (spaceObjects[i].body == objectToRemove) {
@@ -196,9 +196,16 @@ function setup() {
     event.pairs.forEach(({ bodyA, bodyB }) => {
       let objectToRemove;
       if (projectiles.includes(bodyA)) {
-        i = projectiles.includes(bodyA);
+        i = projectiles.indexOf(bodyA);
         objectToRemove = projectiles[i];
-
+        console.log(i);
+        Composite.remove(world, objectToRemove);
+        projectiles.splice(i, 1);
+      } else if (projectiles.includes(bodyB)) {
+        i = projectiles.indexOf(bodyB);
+        console.log(projectiles[i]);
+        objectToRemove = projectiles[i];
+        Composite.remove(world, objectToRemove);
         projectiles.splice(i, 1);
       }
     });
@@ -578,9 +585,9 @@ function introScene() {
 
 function gameOver() {
   shootingEnemy = false;
+  Runner.stop(runner);
   Composite.clear(world);
   Engine.clear(engine);
-  Runner.stop(runner);
   spaceObjects = [];
   projectiles = [];
   platforms = [];
