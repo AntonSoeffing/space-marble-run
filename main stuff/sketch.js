@@ -506,10 +506,10 @@ function keyPressed() {
   // is SPACE pressed?
   if (keyCode === 32) {
     // Press Spacebar to skip TRY AGAIN screen
-    if (scene == 'gameover') {
+    /*if (scene == 'gameover') {
       console.log('lol')
       scene = 'main';
-    }
+    }*/
 
     if (engine.gravity.y == 0) {
       Body.setVelocity(helmetBody,
