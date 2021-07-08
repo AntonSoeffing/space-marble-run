@@ -61,8 +61,6 @@ let reverseEven = false;
 
 let projectileTimer = 2;
 let projectiles = []
-let projectilesCount = 50;
-let projectileNumber = 0;
 let shootingEnemy = false;
 
 let catapultOnlyOnce = true;
@@ -478,10 +476,23 @@ function draw() {
       }
 
       break;
-
+      
+    case 'gameover':
+      setTimeout(function() {scene = 'main';}, 2000);
+      push();
+      background(10);
+      textFont(pixelFont);
+      fill(256);
+      textSize(72);
+      textAlign(CENTER, CENTER);
+      text('TRY AGAIN', windowWidth * 0.5 + window.pageXOffset, windowHeight * 0.5);
+      pop();
+      break;
+  
     case 'gg':
       ggWP()
       break;
+
     default:
       break;
     }
@@ -493,19 +504,26 @@ function draw() {
 
 function keyPressed() {
   // is SPACE pressed?
-  if (keyCode === 32 && engine.gravity.y == 0) {
-    Body.setVelocity(helmetBody,
-      {x: 6.5, y: -0.75}
-    );
-    // Tell p5.js to prevent default behavior on Spacebar press (scrolling)
-    return(false);
+  if (keyCode === 32) {
+    // Press Spacebar to skip TRY AGAIN screen
+    if (scene == 'gameover') {
+      console.log('lol')
+      scene = 'main';
+    }
 
-  } else if (keyCode === 32 && engine.gravity.y == 1 && helmetOnGround == true) {
-    Body.applyForce(helmetBody,
-      {x: helmetBody.position.x, y: helmetBody.position.y},
-      {x: 0.035, y: -0.15}
-    );
-    helmetOnGround = false;
+    if (engine.gravity.y == 0) {
+      Body.setVelocity(helmetBody,
+        {x: 6.5, y: -0.75}
+      );
+      // Tell p5.js to prevent default behavior on Spacebar press (scrolling)
+      return(false);
+    } else if (engine.gravity.y == 1 && helmetOnGround == true) {
+      Body.applyForce(helmetBody,
+        {x: helmetBody.position.x, y: helmetBody.position.y},
+        {x: 0.035, y: -0.15}
+      );
+      helmetOnGround = false;
+    }
   }
 }
 
@@ -565,6 +583,8 @@ function gameOver() {
   projectiles = [];
   platforms = [];
   setup();
+
+  scene = 'gameover';
 }
 
 function ggWP() {
@@ -595,10 +615,10 @@ function marsLanding() {
 
 function projectileRelease() {
   if (shootingEnemy == true) {
-    let newProjectile = Bodies.rectangle(windowWidth * 2.5, 200, 20, 20, {isStatic: false, mass: 4});;
+    let newProjectile = Bodies.rectangle(windowWidth * 2.5, 200, 20, 20);
     projectiles.push(newProjectile);
     Composite.add(world, newProjectile);
-    Body.setVelocity(newProjectile, {x: -(ufo.position.x - helmetBody.position.x)*0.04, y: -(ufo.position.y - helmetBody.position.y)*0.04});
+    Body.setVelocity(newProjectile, {x: -(ufo.position.x - helmetBody.position.x)*0.02, y: -(ufo.position.y - helmetBody.position.y)*0.02});
   }
 }
 
