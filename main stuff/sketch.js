@@ -19,6 +19,8 @@ let engine = Engine.create();
 let world = engine.world;
 let runner = Runner.create();
 
+const framerate = 60;
+
 let rocket;
 let rocketSpriteData;
 let rocketSpriteSheet;
@@ -57,6 +59,7 @@ let onPlatform;
 let reverseOdd = false;
 let reverseEven = false;
 
+let projectileTimer = 2;
 let projectiles = []
 let projectilesCount = 50;
 let projectileNumber = 0;
@@ -122,7 +125,7 @@ function preload() {
 
 function setup() {
   createCanvas(windowWidth * 4, windowHeight);
-
+  frameRate(framerate);
   engine.gravity.y = 0;
 
   // Start Runner
@@ -190,6 +193,23 @@ function setup() {
             break;
           }
         }
+      }
+    });
+  });
+  
+  // Projectile Collision Remove Event
+  Events.on(engine, 'collisionStart', function(event) {
+    event.pairs.forEach(({ bodyA, bodyB }) => {
+      let objectToRemove;
+      if (projectiles.includes(bodyA)) {
+        setTimeout(function() {
+          i = projectiles.includes(bodyA);
+          objectToRemove = projectiles[i];
+
+          projectiles.splice(i, 1);
+
+        }, 2000);
+        
       }
     });
   });
@@ -276,10 +296,6 @@ function setup() {
   ufo = Bodies.circle(windowWidth*2.5, windowHeight*0.15, 50, {isStatic: true});
   Composite.add(world, ufo);
 
-  for (let i = 0; i < projectilesCount; i++) {
-    projectiles[i] = Bodies.rectangle(windowWidth * 2.5, 200, 9,9, {isStatic: true, mass: 4})
-  }
-
   // Stack of blocks
   blockStack = Composites.stack(windowWidth*2.4, 0 , 3, 10, 3, 3, function(x, y) {
     return Bodies.rectangle(x, y, 29, 29);
@@ -314,8 +330,6 @@ function setup() {
 }
 
 function draw() {
-  frameRate(60);
-
   switch (scene) {
     case 'intro':
       introScene();
@@ -389,7 +403,7 @@ function draw() {
         drawSprite(platforms[i], platformSprite);
       }
 
-      if(reverse == false && platformUpDown.position.y < windowHeight*0.8) {
+      if (reverse == false && platformUpDown.position.y < windowHeight*0.8) {
         Body.translate(platformUpDown, {x: 0, y: 4})
       } else if (reverse == true && platformUpDown.position.y > windowHeight*0.3) {
         Body.translate(platformUpDown, {x: 0, y: -4})
@@ -401,7 +415,7 @@ function draw() {
 
       onPlatformUpDown = Matter.SAT.collides(helmetBody, platformUpDown);
 
-      if(onPlatformUpDown.collided && reverse == false) {
+      if (onPlatformUpDown.collided && reverse == false) {
         Body.translate(helmetBody, {x: 0, y: 4})
       }
 
@@ -411,16 +425,24 @@ function draw() {
       drawSprite(platformStatic3, platformSprite)
 
       // UFO Logic
-      fill('red')
-      drawBodies(projectiles)
       drawSprite(ufo, ufoSprite)
 
-      if(helmetBody.position.x > windowWidth * 2 && helmetBody.position.x < windowWidth * 3 && shootingEnemy == false) {
+      if (engine.gravity.y == 1) {
         shootingEnemy = true;
-        projectileRelease();
       }
 
-      if(helmetBody.position.x > windowWidth * 3) {
+      if (helmetBody.position.x > windowWidth * 2 && helmetBody.position.x < windowWidth * 3 && shootingEnemy == true) {
+        if (frameCount % (projectileTimer * framerate) == 0) {
+          projectileRelease();
+        }
+      }
+      
+      if (projectiles.length > 0) {
+        fill('red');
+        drawBodies(projectiles)
+      }
+
+      if (helmetBody.position.x > windowWidth * 3) {
         shootingEnemy = false;
       }
 
@@ -580,14 +602,11 @@ function marsLanding() {
 }
 
 function projectileRelease() {
-  if (projectileNumber < projectilesCount && shootingEnemy == true) {
-    setTimeout(function() {
-      Matter.Body.setStatic(projectiles[projectileNumber], false)
-      Composite.add(world, projectiles[projectileNumber])
-      Body.setVelocity(projectiles[projectileNumber], {x: -(ufo.position.x - helmetBody.position.x)*0.04, y: -(ufo.position.y - helmetBody.position.y)*0.04})
-      projectileNumber++
-      projectileRelease()
-    }, 1700)
+  if (shootingEnemy == true) {
+    let newProjectile = Bodies.rectangle(windowWidth * 2.5, 200, 9,9, {isStatic: false, mass: 4});;
+    projectiles.push(newProjectile);
+    Composite.add(world, newProjectile);
+    Body.setVelocity(newProjectile, {x: -(ufo.position.x - helmetBody.position.x)*0.04, y: -(ufo.position.y - helmetBody.position.y)*0.04});
   }
 }
 
