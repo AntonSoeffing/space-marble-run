@@ -132,7 +132,7 @@ function setup() {
   Runner.run(runner, engine);
 
   // Backgrounds
-  spaceBackground = new Background('space', 60, 100);
+  spaceBackground = new Background('space', 100, 130);
   marsBackground = new Background('mars');
 
   // ----- SPACE -----
@@ -495,7 +495,7 @@ function keyPressed() {
   // is SPACE pressed?
   if (keyCode === 32 && engine.gravity.y == 0) {
     Body.setVelocity(helmetBody,
-      {x: 2.0, y: -0.75}
+      {x: 6.5, y: -0.75}
     );
     // Tell p5.js to prevent default behavior on Spacebar press (scrolling)
     return(false);
@@ -547,7 +547,8 @@ function introScene() {
     fill(256);
     textSize(72);
     textAlign(CENTER, CENTER);
-    text('Oh noo my helmet fml', 500, 500);
+    text('Oh nooo', windowWidth * 0.2, windowHeight * 0.2);
+    text('MY HELMET', windowWidth * 0.8, windowHeight * 0.8);
   } else {
     scene = 'main';
     console.log('main scene');
@@ -612,13 +613,13 @@ function spawnDebris(x, y) {
     case 0:
         //console.log('New Comet!');
         let sprite = new Sprite(cometSpriteData, cometSpriteSheet, 0.075);
-        let body = Bodies.circle(x, y, sprite.animation[0].height / 4, {angle: 1.25 * Math.PI, mass: 0.25});
+        let body = Bodies.circle(x, y, sprite.animation[0].height / 4, {angle: 1.25 * Math.PI, mass: random(0.1, 0.3)});
         spaceObjects.push(new Comet(body, sprite));
         Composite.add(world, body);
         break;
       case 1:
         //console.log('New Satellite!');
-        satelliteBody = Bodies.rectangle(x, y, satelliteSprite.width, satelliteSprite.height, {torque: random(-100, 100), mass: 0.2});
+        satelliteBody = Bodies.rectangle(x, y, satelliteSprite.width, satelliteSprite.height, {torque: random(-100, 100), mass: random(0.075, 0.2)});
         spaceObjects.push(new Satellite(satelliteBody, satelliteSprite));
         Composite.add(world, satelliteBody);
         break;
