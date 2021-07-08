@@ -19,7 +19,7 @@ let engine = Engine.create();
 let world = engine.world;
 let runner = Runner.create();
 
-const framerate = 60;
+const fps = 60;
 
 let rocket;
 let rocketSpriteData;
@@ -125,7 +125,7 @@ function preload() {
 
 function setup() {
   createCanvas(windowWidth * 4, windowHeight);
-  frameRate(framerate);
+  frameRate(fps);
   engine.gravity.y = 0;
 
   // Start Runner
@@ -167,11 +167,7 @@ function setup() {
   let spaceObjectsCount = 5;
 
   for (let i = 0; i < spaceObjectsCount; i++) {
-    let sprite = new Sprite(cometSpriteData, cometSpriteSheet, 0.075);
-    let body = Bodies.circle(random(100, windowWidth), random(0, 800), sprite.animation[0].height / 4, {angle: 1.25 * Math.PI, mass: 0.25});
-    spaceObjects.push(new Comet(body, sprite));
-
-    Composite.add(world, body);
+    spawnDebris(random(0, windowWidth), random(- windowHeight * 0.2, 0));
   }
 
   // Black Hole Collision Event
@@ -202,14 +198,10 @@ function setup() {
     event.pairs.forEach(({ bodyA, bodyB }) => {
       let objectToRemove;
       if (projectiles.includes(bodyA)) {
-        setTimeout(function() {
-          i = projectiles.includes(bodyA);
-          objectToRemove = projectiles[i];
+        i = projectiles.includes(bodyA);
+        objectToRemove = projectiles[i];
 
-          projectiles.splice(i, 1);
-
-        }, 2000);
-        
+        projectiles.splice(i, 1);
       }
     });
   });
@@ -432,7 +424,7 @@ function draw() {
       }
 
       if (helmetBody.position.x > windowWidth * 2 && helmetBody.position.x < windowWidth * 3 && shootingEnemy == true) {
-        if (frameCount % (projectileTimer * framerate) == 0) {
+        if (frameCount % (projectileTimer * fps) == 0) {
           projectileRelease();
         }
       }
@@ -503,13 +495,12 @@ function keyPressed() {
   // is SPACE pressed?
   if (keyCode === 32 && engine.gravity.y == 0) {
     Body.setVelocity(helmetBody,
-      {x: 15.25, y: -0.5}
+      {x: 2.0, y: -0.75}
     );
     // Tell p5.js to prevent default behavior on Spacebar press (scrolling)
     return(false);
-    //&& helmetBody.velocity.y < 0.05 && helmetBody.velocity.y > -0.05
-  //} else if (keyCode === 32 && engine.gravity.y == 1 && helmetOnGround == true) {
-  } else if (keyCode === 32 && engine.gravity.y == 1) {
+
+  } else if (keyCode === 32 && engine.gravity.y == 1 && helmetOnGround == true) {
     Body.applyForce(helmetBody,
       {x: helmetBody.position.x, y: helmetBody.position.y},
       {x: 0.035, y: -0.15}
@@ -603,7 +594,7 @@ function marsLanding() {
 
 function projectileRelease() {
   if (shootingEnemy == true) {
-    let newProjectile = Bodies.rectangle(windowWidth * 2.5, 200, 9,9, {isStatic: false, mass: 4});;
+    let newProjectile = Bodies.rectangle(windowWidth * 2.5, 200, 20, 20, {isStatic: false, mass: 4});;
     projectiles.push(newProjectile);
     Composite.add(world, newProjectile);
     Body.setVelocity(newProjectile, {x: -(ufo.position.x - helmetBody.position.x)*0.04, y: -(ufo.position.y - helmetBody.position.y)*0.04});
