@@ -498,7 +498,9 @@ function draw() {
     }
 
   if (helmetBody.position.y > height || helmetBody.position.y < 0 ) {
-    gameOver();
+    if (scene !== 'gameover') {
+      gameOver();
+    }
   }
 }
 
