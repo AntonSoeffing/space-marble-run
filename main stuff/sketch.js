@@ -82,7 +82,7 @@ function preload() {
   star2Sprite = loadImage('sprites/backgrounds/space/stars/star_2.png');
 
   // Black Hole
-  blackHoleSprite = loadImage('sprites/space/blackHole.png');
+  blackHoleSprite = loadImage('sprites/space/blackhole.png');
 
   // Helmet
   helmetSprite = loadImage('sprites/helmet.png');
